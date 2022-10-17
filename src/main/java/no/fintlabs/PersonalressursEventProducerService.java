@@ -8,12 +8,12 @@ import no.fintlabs.kafka.event.topic.EventTopicNameParameters;
 import org.springframework.stereotype.Service;
 
 @Service
-public class NewPersonalressursEventProducerService {
+public class PersonalressursEventProducerService {
 
     private final EventProducer<PersonalressursResource> eventProducer;
     private final EventTopicNameParameters eventTopicNameParameters;
 
-    public NewPersonalressursEventProducerService(
+    public PersonalressursEventProducerService(
             EventProducerFactory eventProducerFactory
     ) {
         eventProducer = eventProducerFactory.createProducer(PersonalressursResource.class);

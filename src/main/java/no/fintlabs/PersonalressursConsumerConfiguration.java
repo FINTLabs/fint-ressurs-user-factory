@@ -17,14 +17,16 @@ public class PersonalressursConsumerConfiguration {
             EntityConsumerFactoryService entityConsumerFactoryService
     ) {
         return entityConsumerFactoryService.createFactory(
-                PersonalressursResource.class,
-                (ConsumerRecord<String, PersonalressursResource> consumerRecord) -> personalressursService.process(consumerRecord.value())
-        ).createContainer(
-                EntityTopicNameParameters
-                        .builder()
-                        .resource("administrasjon.personal.personalressurs")
-                        .build()
-        );
+                        PersonalressursResource.class,
+                        (ConsumerRecord<String, PersonalressursResource> consumerRecord)
+                                -> personalressursService.process(consumerRecord.value()))
+                                .createContainer(EntityTopicNameParameters
+                                    .builder()
+                                    .resource("administrasjon.personal.personalressurs")
+                                    .build()
+                );
     }
+
+
 
 }

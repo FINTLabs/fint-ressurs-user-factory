@@ -8,14 +8,15 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PersonalressursService {
 
-    private final NewPersonalressursEventProducerService newPersonalressursEventProducerService;
+    private final PersonalressursEventProducerService personalressursEventProducerService;
 
-    public PersonalressursService(NewPersonalressursEventProducerService newPersonalressursEventProducerService) {
-        this.newPersonalressursEventProducerService = newPersonalressursEventProducerService;
+    public PersonalressursService(PersonalressursEventProducerService personalressursEventProducerService) {
+        this.personalressursEventProducerService = personalressursEventProducerService;
     }
 
     public void process(PersonalressursResource personalressursResource) {
         log.info(personalressursResource.getAnsattnummer().getIdentifikatorverdi());
-        newPersonalressursEventProducerService.publish(personalressursResource);
+
+        personalressursEventProducerService.publish(personalressursResource);
     }
 }
