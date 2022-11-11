@@ -4,6 +4,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
+import no.fintlabs.user.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,20 +14,25 @@ import java.util.Locale;
 public class ResourceEntityCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
+    private final User.UserEventListenerService userEventListenerService;
 
-    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
+    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager, User.UserEventListenerService userEventListenerService) {
         this.fintCacheManager = fintCacheManager;
+        this.userEventListenerService = userEventListenerService;
     }
-
 
     @Bean
     FintCache<String, PersonalressursResource> personalressursResourceCache() {
-        return createCache(PersonalressursResource.class);
+        FintCache<String, PersonalressursResource> cache = createCache(PersonalressursResource.class);
+        cache.addEventListener(userEventListenerService::onPersonalressursEvent);
+        return cache;
     }
 
     @Bean
     FintCache<String, PersonResource> personResourceCache() {
-        return createCache(PersonResource.class);
+        FintCache<String, PersonResource> cache = createCache(PersonResource.class);
+        cache.addEventListener(userEventListenerService::onPersonEvent);
+        return cache;
     }
 
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {

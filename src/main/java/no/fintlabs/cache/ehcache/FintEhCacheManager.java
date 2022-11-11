@@ -52,7 +52,7 @@ public class FintEhCacheManager implements FintCacheManager {
                         cacheConfiguration
                 )
         );
-        //cache.addEventListener(new FintEhCacheEventLogger<>(alias));
+        cache.addEventListener(new FintEhCacheEventLogger<>(alias));
         return cache;
     }
 
