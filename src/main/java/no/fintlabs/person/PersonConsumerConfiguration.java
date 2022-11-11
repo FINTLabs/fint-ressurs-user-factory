@@ -1,4 +1,4 @@
-package no.fintlabs;
+package no.fintlabs.person;
 
 
 import no.fint.model.resource.felles.PersonResource;
@@ -8,8 +8,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-
-import java.util.function.Consumer;
 
 @Configuration
 public class PersonConsumerConfiguration {

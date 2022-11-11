@@ -1,4 +1,4 @@
-package no.fintlabs;
+package no.fintlabs.personalressurs;
 
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fintlabs.kafka.event.EventProducer;

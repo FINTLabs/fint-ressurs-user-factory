@@ -10,6 +10,7 @@ import java.util.List;
 public class User {
 
     private String userId;
+    private String fintSelfLink;
     private String firstName;
     private String lastName;
     private String userType;

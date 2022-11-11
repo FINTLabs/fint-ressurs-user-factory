@@ -1,5 +1,8 @@
 fint:
   application-id: fint-ressurs-user-factory
+  cache:
+    defaultCacheEntryTimeToLiveMillis: 518400000
+    defaultCacheHeapSize: 1000000
   kafka:
     topic:
       org-id: ${fint.org-id}
@@ -16,3 +19,4 @@ logging:
   level:
     root: INFO
     org.apache.kafka: INFO
+
