@@ -6,6 +6,7 @@ import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
 import no.fintlabs.user.User;
 import no.fintlabs.user.UserEventListenerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +17,7 @@ public class ResourceEntityCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
     private final UserEventListenerService userEventListenerService;
+
 
     public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager, UserEventListenerService userEventListenerService) {
         this.fintCacheManager = fintCacheManager;
@@ -35,6 +37,7 @@ public class ResourceEntityCacheConfiguration {
         cache.addEventListener(userEventListenerService::onPersonEvent);
         return cache;
     }
+
 
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {
         return fintCacheManager.createCache(
