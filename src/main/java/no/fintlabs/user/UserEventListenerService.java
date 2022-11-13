@@ -29,6 +29,8 @@ public class UserEventListenerService {
     }
 
 
+
+
     public void onPersonEvent(FintCacheEvent<String, PersonResource> cacheEvent) {
         PersonResource personResource = cacheEvent.getNewValue();
         String personalressursHref = ResourceLinkUtil.getFirstLink(

@@ -2,9 +2,12 @@ package no.fintlabs.user;
 
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,7 +25,10 @@ public class UserService {
                 .userId(personalressursResource.getAnsattnummer().getIdentifikatorverdi())
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
-                .fintSelfLink(personResource.getSelfLinks().get(0).getHref())
+                .userName(personalressursResource.getBrukernavn().getIdentifikatorverdi())
+                .mobilePhone(personResource.getKontaktinformasjon().getMobiltelefonnummer())
+                .email(personResource.getKontaktinformasjon().getEpostadresse())
+                .managerRef(getManagerRef(personalressursResource))
                 .build();
 
         userEntityProducerService.publish(user);
@@ -30,4 +36,18 @@ public class UserService {
 
     }
 
+    private String getManagerRef(PersonalressursResource personalressursResource) {
+        List<Link> arbeidsforhold = personalressursResource.getArbeidsforhold();
+        for (Link arb:arbeidsforhold) {
+
+
+        }
+
+
+        return "dummy";
+    }
+
 }
+
+
+
