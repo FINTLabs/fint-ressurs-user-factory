@@ -6,9 +6,6 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
-import no.fintlabs.user.User;
-import no.fintlabs.user.UserEventListenerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,40 +15,29 @@ import java.util.Locale;
 public class ResourceEntityCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
-    private final UserEventListenerService userEventListenerService;
 
-
-
-    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager, UserEventListenerService userEventListenerService) {
+    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
         this.fintCacheManager = fintCacheManager;
-        this.userEventListenerService = userEventListenerService;
     }
 
     @Bean
     FintCache<String, PersonalressursResource> personalressursResourceCache() {
-        FintCache<String, PersonalressursResource> cache = createCache(PersonalressursResource.class);
-        cache.addEventListener(userEventListenerService::onPersonalressursEvent);
-        return cache;
+        return createCache(PersonalressursResource.class);
     }
 
     @Bean
     FintCache<String, PersonResource> personResourceCache() {
-
-        FintCache<String, PersonResource> cache = createCache(PersonResource.class);
-        cache.addEventListener(userEventListenerService::onPersonEvent);
-        return cache;
+        return createCache(PersonResource.class);
     }
 
     @Bean
-    FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache(){
-        FintCache<String, OrganisasjonselementResource> cache = createCache(OrganisasjonselementResource.class);
-        return cache;
+    FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache() {
+        return createCache(OrganisasjonselementResource.class);
     }
 
     @Bean
-    FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache(){
-        FintCache<String, ArbeidsforholdResource> cache = createCache(ArbeidsforholdResource.class);
-        return cache;
+    FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache() {
+        return createCache(ArbeidsforholdResource.class);
     }
 
 

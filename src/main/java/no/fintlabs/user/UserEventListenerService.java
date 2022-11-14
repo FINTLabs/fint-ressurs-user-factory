@@ -4,13 +4,15 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheEvent;
+import no.fintlabs.cache.FintCacheEventListener;
+import no.fintlabs.cache.ehcache.FintEhCacheEventListener;
 import no.fintlabs.links.ResourceLinkUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-@Service
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Service("userEventListenerService")
 public class UserEventListenerService {
 
     private final FintCache<String, PersonalressursResource> personalressursResourceCache;
@@ -26,10 +28,19 @@ public class UserEventListenerService {
         this.personalressursResourceCache = personalressursResourceCache;
         this.personResourceCache = personResourceCache;
         this.userService = userService;
+        personResourceCache.addEventListener(new FintEhCacheEventListener<>() {
+            @Override
+            public void onEvent(FintCacheEvent<String, PersonResource> event) {
+                onPersonEvent(event);
+            }
+        });
+        personalressursResourceCache.addEventListener(new FintEhCacheEventListener<>() {
+            @Override
+            public void onEvent(FintCacheEvent<String, PersonalressursResource> event) {
+                onPersonalressursEvent(event);
+            }
+        });
     }
-
-
-
 
     public void onPersonEvent(FintCacheEvent<String, PersonResource> cacheEvent) {
         PersonResource personResource = cacheEvent.getNewValue();
@@ -40,10 +51,9 @@ public class UserEventListenerService {
         );
         personalressursResourceCache.getOptional(personalressursHref)
                 .ifPresent(personalressursResource -> userService.prepareForPublish(
-                        personResource, personalressursResource
-                ));
+                personResource, personalressursResource
+        ));
     }
-
 
     public void onPersonalressursEvent(FintCacheEvent<String, PersonalressursResource> cacheEvent) {
         PersonalressursResource personalressursResource = cacheEvent.getNewValue();
