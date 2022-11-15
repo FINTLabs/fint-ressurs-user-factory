@@ -27,7 +27,7 @@ public class UserEntityProducerService {
 
 
     public void publish(User user) {
-        String key = user.getFintSelfLink();
+        String key = user.getUserId();
         entityProducer.send(
                 EntityProducerRecord.<User>builder()
                         .topicNameParameters(entityTopicNameParameters)
