@@ -1,5 +1,6 @@
 package no.fintlabs.cache;
 
+import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.exceptions.NoSuchCacheEntryException;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public interface FintCache<K, V> {
         return this.getOptional(key).orElseThrow(() -> new NoSuchCacheEntryException(key.toString()));
     }
 
-    Optional<V> getOptional(K key);
+    ArbeidsforholdResource getOptional(K key);
 
     List<V> get(Collection<K> keys);
 

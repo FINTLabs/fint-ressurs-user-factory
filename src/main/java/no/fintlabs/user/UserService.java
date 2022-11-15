@@ -1,24 +1,27 @@
 package no.fintlabs.user;
 
 
-import io.netty.util.internal.ObjectPool;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.Link;
+import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
+import no.fintlabs.arbeidforhold.ArbeidsforholdService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserService {
     private final UserEntityProducerService userEntityProducerService;
+    private final ArbeidsforholdService arbeidsforholdService;
 
-    public UserService(UserEntityProducerService userEntityProducerService) {
+    public UserService(UserEntityProducerService userEntityProducerService, ArbeidsforholdService arbeidsforholdService) {
 
         this.userEntityProducerService = userEntityProducerService;
+        this.arbeidsforholdService = arbeidsforholdService;
     }
 
 
@@ -61,11 +64,12 @@ public class UserService {
     }
 
     private String getManagerRef(PersonalressursResource personalressursResource) {
-        List<Link> arbeidsforhold = personalressursResource.getArbeidsforhold();
-        for (Link arb:arbeidsforhold) {
+        List<String> arbeidsforhold = (personalressursResource.getArbeidsforhold())
+                .stream().map(a -> a.getHref())
+                .collect(Collectors.toList());
+        Optional<ArbeidsforholdResource> currentArbeidsforhold = arbeidsforholdService.getNewestArbeidsforhold(arbeidsforhold);
 
-
-        }
+        //TODO: Hente arbeidsted -> leder href
 
 
         return "dummy";

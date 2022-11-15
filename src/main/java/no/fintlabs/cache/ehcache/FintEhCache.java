@@ -1,6 +1,7 @@
 package no.fintlabs.cache.ehcache;
 
 import lombok.Getter;
+import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheEventListener;
 import org.ehcache.Cache;
@@ -29,7 +30,7 @@ public class FintEhCache<K, V> implements FintCache<K, V> {
     }
 
     @Override
-    public Optional<V> getOptional(K key) {
+    public ArbeidsforholdResource getOptional(K key) {
         return Optional.ofNullable(this.cache.get(key));
     }
 
