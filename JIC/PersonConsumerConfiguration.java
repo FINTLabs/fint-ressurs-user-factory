@@ -14,7 +14,7 @@ public class PersonConsumerConfiguration {
 
     @Bean
     public ConcurrentMessageListenerContainer<String, PersonResource> personressursConsumer(
-         PersonressursService personressursService,
+         PersonService personService,
          EntityConsumerFactoryService entityConsumerFactoryService
     ){
         EntityTopicNameParameters entityTopicNameParameters = EntityTopicNameParameters
@@ -24,7 +24,7 @@ public class PersonConsumerConfiguration {
         ConcurrentMessageListenerContainer container = entityConsumerFactoryService.createFactory(
                 PersonResource.class,
                 (ConsumerRecord<String,PersonResource> consumerRecord)
-                -> personressursService.process(consumerRecord.value()))
+                -> personService.process(consumerRecord.value()))
                 .createContainer(entityTopicNameParameters);
 
         return container;

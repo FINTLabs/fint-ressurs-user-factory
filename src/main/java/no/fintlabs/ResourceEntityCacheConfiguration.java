@@ -1,5 +1,7 @@
 package no.fintlabs;
 
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
+import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
@@ -18,7 +20,6 @@ public class ResourceEntityCacheConfiguration {
         this.fintCacheManager = fintCacheManager;
     }
 
-
     @Bean
     FintCache<String, PersonalressursResource> personalressursResourceCache() {
         return createCache(PersonalressursResource.class);
@@ -28,6 +29,17 @@ public class ResourceEntityCacheConfiguration {
     FintCache<String, PersonResource> personResourceCache() {
         return createCache(PersonResource.class);
     }
+
+    @Bean
+    FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache() {
+        return createCache(OrganisasjonselementResource.class);
+    }
+
+    @Bean
+    FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache() {
+        return createCache(ArbeidsforholdResource.class);
+    }
+
 
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {
         return fintCacheManager.createCache(

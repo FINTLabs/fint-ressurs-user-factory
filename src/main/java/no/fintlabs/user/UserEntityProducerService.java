@@ -1,7 +1,7 @@
 package no.fintlabs.user;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.ResourceEntityConsumersConfiguration;
+import no.fintlabs.cache.FintCacheEventListener;
 import no.fintlabs.kafka.entity.EntityProducer;
 import no.fintlabs.kafka.entity.EntityProducerFactory;
 import no.fintlabs.kafka.entity.EntityProducerRecord;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class UserEntityProducerService {
-
     private final EntityProducer<User> entityProducer;
     private final EntityTopicNameParameters entityTopicNameParameters;
 
-    public UserEntityProducerService(EntityProducerFactory entityProducerFactory){
+    public UserEntityProducerService( EntityProducerFactory entityProducerFactory){
+
         entityProducer = entityProducerFactory.createProducer(User.class);
         entityTopicNameParameters = EntityTopicNameParameters
                 .builder()
@@ -27,7 +27,7 @@ public class UserEntityProducerService {
 
 
     public void publish(User user) {
-        String key = user.getFintSelfLink();
+        String key = user.getUserId();
         entityProducer.send(
                 EntityProducerRecord.<User>builder()
                         .topicNameParameters(entityTopicNameParameters)
