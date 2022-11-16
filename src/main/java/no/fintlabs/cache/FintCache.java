@@ -16,7 +16,7 @@ public interface FintCache<K, V> {
         return this.getOptional(key).orElseThrow(() -> new NoSuchCacheEntryException(key.toString()));
     }
 
-    ArbeidsforholdResource getOptional(K key);
+    Optional<V> getOptional(K key);
 
     List<V> get(Collection<K> keys);
 

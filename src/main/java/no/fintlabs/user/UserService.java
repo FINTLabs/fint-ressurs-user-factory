@@ -6,6 +6,7 @@ import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.arbeidforhold.ArbeidsforholdService;
+import no.fintlabs.arbeidssted.ArbeidsstedService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +18,15 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserEntityProducerService userEntityProducerService;
     private final ArbeidsforholdService arbeidsforholdService;
+    private final ArbeidsstedService arbeidsstedService;
 
-    public UserService(UserEntityProducerService userEntityProducerService, ArbeidsforholdService arbeidsforholdService) {
+    public UserService(UserEntityProducerService userEntityProducerService,
+                       ArbeidsforholdService arbeidsforholdService,
+                       ArbeidsstedService arbeidsstedService) {
 
         this.userEntityProducerService = userEntityProducerService;
         this.arbeidsforholdService = arbeidsforholdService;
+        this.arbeidsstedService = arbeidsstedService;
     }
 
 
@@ -55,24 +60,22 @@ public class UserService {
                 .userName(userName)
                 .mobilePhone(mobilePhone)
                 .email(email)
-                //.managerRef(getManagerRef(personalressursResource))
+                .managerRef(getManagerRef(personalressursResource))
                 .build();
 
         userEntityProducerService.publish(user);
 
-
     }
 
     private String getManagerRef(PersonalressursResource personalressursResource) {
-        List<String> arbeidsforhold = (personalressursResource.getArbeidsforhold())
+        List<String> arbeidsforholdHrefs = (personalressursResource.getArbeidsforhold())
                 .stream().map(a -> a.getHref())
                 .collect(Collectors.toList());
-        Optional<ArbeidsforholdResource> currentArbeidsforhold = arbeidsforholdService.getNewestArbeidsforhold(arbeidsforhold);
 
-        //TODO: Hente arbeidsted -> leder href
+        Optional<ArbeidsforholdResource> currentArbeidsforhold = arbeidsforholdService.getNewestArbeidsforhold(arbeidsforholdHrefs);
+        String leder = arbeidsstedService.getLeder(currentArbeidsforhold);
 
-
-        return "dummy";
+        return leder;
     }
 
 }

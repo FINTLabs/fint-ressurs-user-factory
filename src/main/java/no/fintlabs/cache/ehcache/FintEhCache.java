@@ -30,10 +30,9 @@ public class FintEhCache<K, V> implements FintCache<K, V> {
     }
 
     @Override
-    public ArbeidsforholdResource getOptional(K key) {
+    public Optional<V> getOptional(K key) {
         return Optional.ofNullable(this.cache.get(key));
     }
-
     @Override
     public List<V> get(Collection<K> keys) {
         return new ArrayList<>(this.cache.getAll(new HashSet<>(keys)).values());

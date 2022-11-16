@@ -40,7 +40,6 @@ public class ResourceEntityCacheConfiguration {
         return createCache(ArbeidsforholdResource.class);
     }
 
-
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {
         return fintCacheManager.createCache(
                 resourceClass.getName().toLowerCase(Locale.ROOT),

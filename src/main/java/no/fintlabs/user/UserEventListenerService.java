@@ -4,22 +4,15 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheEvent;
-import no.fintlabs.cache.FintCacheEventListener;
 import no.fintlabs.cache.ehcache.FintEhCacheEventListener;
 import no.fintlabs.links.ResourceLinkUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 @Service("userEventListenerService")
 public class UserEventListenerService {
-
     private final FintCache<String, PersonalressursResource> personalressursResourceCache;
     private final FintCache<String, PersonResource> personResourceCache;
-
     private final UserService userService;
-
 
     public UserEventListenerService(
             FintCache<String, PersonalressursResource> personalressursResourceCache,

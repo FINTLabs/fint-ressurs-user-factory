@@ -41,7 +41,6 @@ public class ResourceEntityConsumersConfiguration {
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
 
-
     @Bean
     ConcurrentMessageListenerContainer<String, PersonalressursResource> personalressursResourceEntityConsumer(
             FintCache<String, PersonalressursResource> personalressursResourceCache
@@ -64,7 +63,6 @@ public class ResourceEntityConsumersConfiguration {
         );
     }
 
-
     @Bean
     ConcurrentMessageListenerContainer<String, OrganisasjonselementResource> organisasjonselementResourceEntityConsumer(
             FintCache<String,OrganisasjonselementResource> organisasjonselementResourceCache
@@ -76,6 +74,7 @@ public class ResourceEntityConsumersConfiguration {
         );
     }
 
+    @Bean
     ConcurrentMessageListenerContainer<String, ArbeidsforholdResource> arbeidsforholdResourceEntityConsumer(
             FintCache<String,ArbeidsforholdResource> arbeidsforholdResourceCache
     ){
