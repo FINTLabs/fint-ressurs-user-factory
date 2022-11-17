@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 public class UserEventListenerService {
     private final FintCache<String, PersonalressursResource> personalressursResourceCache;
     private final FintCache<String, PersonResource> personResourceCache;
+
     private final UserService userService;
+
 
     public UserEventListenerService(
             FintCache<String, PersonalressursResource> personalressursResourceCache,

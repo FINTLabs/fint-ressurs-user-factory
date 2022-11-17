@@ -37,6 +37,7 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'no.fintlabs:fint-kafka:2.3.0'
     implementation 'org.ehcache:ehcache:3.1.0'
+    implementation 'no.fintlabs:fint-flyt-cache:1.0.0'
 
     implementation("no.fint:fint-administrasjon-resource-model-java:${apiVersion}")
 
