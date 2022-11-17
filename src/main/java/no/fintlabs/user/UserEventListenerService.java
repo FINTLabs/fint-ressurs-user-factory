@@ -23,8 +23,10 @@ public class UserEventListenerService {
         this.personalressursResourceCache = personalressursResourceCache;
         this.personResourceCache = personResourceCache;
         this.userService = userService;
+
         personResourceCache.addEventListener(new FintEhCacheEventListener<>() {
-            @Override
+
+            //public void onEvent(FintCacheEvent<String, PersonResource> event) {
             public void onEvent(FintCacheEvent<String, PersonResource> event) {
                 onPersonEvent(event);
             }
