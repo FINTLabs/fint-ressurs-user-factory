@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Locale;
 
 @Configuration
-public class ResourceEntityCacheConfiguration {
+public class EmployeeResourceEntityCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
 
-    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
+    public EmployeeResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
         this.fintCacheManager = fintCacheManager;
     }
 

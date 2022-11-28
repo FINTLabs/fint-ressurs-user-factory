@@ -17,12 +17,12 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 @Configuration
 @DependsOn("userEventListenerService")
-public class ResourceEntityConsumersConfiguration {
+public class EmployeeResourceEntityConsumersConfiguration {
 
     private final EntityConsumerFactoryService entityConsumerFactoryService;
 
 
-    public ResourceEntityConsumersConfiguration(EntityConsumerFactoryService entityConsumerFactoryService) {
+    public EmployeeResourceEntityConsumersConfiguration(EntityConsumerFactoryService entityConsumerFactoryService) {
         this.entityConsumerFactoryService = entityConsumerFactoryService;
     }
 

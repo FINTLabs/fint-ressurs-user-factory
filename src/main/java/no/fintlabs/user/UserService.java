@@ -7,6 +7,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.arbeidforhold.ArbeidsforholdService;
 import no.fintlabs.arbeidssted.ArbeidsstedService;
+import no.fintlabs.links.ResourceLinkUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,31 +36,20 @@ public class UserService {
         String mobilePhone;
         String email;
         try {
-            userName = personalressursResource.getBrukernavn().getIdentifikatorverdi();
-        } catch (NullPointerException e) {
-            log.info("username not found");
-            userName= "";
-        }
-        try {
             mobilePhone = personResource.getKontaktinformasjon().getMobiltelefonnummer();
         } catch (NullPointerException e) {
             log.info("mobilePhone not found");
             mobilePhone = "";
         }
-        try {
-            email = personResource.getKontaktinformasjon().getEpostadresse();
-        } catch (NullPointerException e) {
-            log.info("email not found");
-            email = "";
-        }
+
 
         User user = User.builder()
-                .userId(personalressursResource.getAnsattnummer().getIdentifikatorverdi())
+                //.resourceId(personalressursResource.getAnsattnummer().getIdentifikatorverdi())
+                .resourceId(ResourceLinkUtil.getFirstSelfLink(personalressursResource))
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
-                .userName(userName)
+                .userType(String.valueOf(UserUtils.userType.EMPLOYEE))
                 .mobilePhone(mobilePhone)
-                .email(email)
                 .managerRef(getManagerRef(personalressursResource))
                 .build();
 
