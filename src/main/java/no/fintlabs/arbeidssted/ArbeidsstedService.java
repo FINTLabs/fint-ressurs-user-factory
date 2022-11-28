@@ -24,11 +24,19 @@ public class ArbeidsstedService {
     }
 
 
-    public String getLeder(Optional<ArbeidsforholdResource> currentArbeidsforhold) {
+    public String getLeder(ArbeidsforholdResource currentArbeidsforhold) {
 
-        String arbeidsstedHref = currentArbeidsforhold.get().getArbeidssted().get(0).toString();
+        String arbeidsstedHref = ResourceLinkUtil.getFirstLink(
+                currentArbeidsforhold::getArbeidssted,
+                currentArbeidsforhold,
+                "arbeidssted");
+        //String arbeidsstedHref = currentArbeidsforhold.getArbeidssted().get(0).toString();
         OrganisasjonselementResource organisasjonselementResource = organisasjonselementResourceCache.get(arbeidsstedHref);
 
-        return organisasjonselementResource.getLeder().get(0).toString();
+        //return organisasjonselementResource.getLeder().get(0).toString();
+        return ResourceLinkUtil.getFirstLink(
+                organisasjonselementResource::getLeder,
+                organisasjonselementResource,
+                "leder");
     }
 }

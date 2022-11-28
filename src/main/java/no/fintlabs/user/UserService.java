@@ -62,7 +62,8 @@ public class UserService {
                 .stream().map(a -> a.getHref())
                 .collect(Collectors.toList());
 
-        Optional<ArbeidsforholdResource> currentArbeidsforhold = arbeidsforholdService.getNewestArbeidsforhold(arbeidsforholdHrefs);
+        ArbeidsforholdResource currentArbeidsforhold = arbeidsforholdService.getNewestArbeidsforhold(arbeidsforholdHrefs)
+                .orElseThrow();
         String leder = arbeidsstedService.getLeder(currentArbeidsforhold);
 
         return leder;
