@@ -1,5 +1,7 @@
 package no.fintlabs.user;
 
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
+import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class UserEventListenerService {
     private final FintCache<String, PersonalressursResource> personalressursResourceCache;
     private final FintCache<String, PersonResource> personResourceCache;
+    private final FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache;
+    private final FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache;
 
     private final UserService userService;
 
@@ -19,9 +23,11 @@ public class UserEventListenerService {
     public UserEventListenerService(
             FintCache<String, PersonalressursResource> personalressursResourceCache,
             FintCache<String, PersonResource> personResourceCache,
-            UserService userService) {
+            FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache, FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache, UserService userService) {
         this.personalressursResourceCache = personalressursResourceCache;
         this.personResourceCache = personResourceCache;
+        this.arbeidsforholdResourceCache = arbeidsforholdResourceCache;
+        this.organisasjonselementResourceCache = organisasjonselementResourceCache;
         this.userService = userService;
 
         personResourceCache.addEventListener(new FintEhCacheEventListener<>() {
@@ -37,7 +43,34 @@ public class UserEventListenerService {
                 onPersonalressursEvent(event);
             }
         });
+//        arbeidsforholdResourceCache.addEventListener((FintEhCacheEventListener) (event)->{
+//            onArbeidsforholdResourceEvent(event);
+//        });
+//        organisasjonselementResourceCache.addEventListener((FintEhCacheEventListener) (event)->{
+//            onOrganisasjonselementResourceEvent(event);
+//        });
     }
+//
+//    private void onOrganisasjonselementResourceEvent(FintCacheEvent<String,OrganisasjonselementResource> cacheEvent) {
+//        OrganisasjonselementResource organisasjonselementResource = cacheEvent.getNewValue();
+//        String organisasjonselementressursHref = ResourceLinkUtil.getFirstLink(
+//                organisasjonselementResource::getLeder,
+//                organisasjonselementResource,
+//                "leder"
+//        );
+//    }
+//
+//    private void onArbeidsforholdResourceEvent(FintCacheEvent<String,ArbeidsforholdResource> cacheEvent) {
+//        ArbeidsforholdResource arbeidsforholdResource = cacheEvent.getNewValue();
+//        String arbeidsforholdressursHref = ResourceLinkUtil.getFirstLink(
+//                arbeidsforholdResource::getArbeidssted,
+//                arbeidsforholdResource,
+//                "arbeidssted"
+//        );
+//        arbeidsforholdResourceCache.getOptional(arbeidsforholdressursHref)
+//                .ifPresent();
+//    }
+
 
     public void onPersonEvent(FintCacheEvent<String, PersonResource> cacheEvent) {
         PersonResource personResource = cacheEvent.getNewValue();
