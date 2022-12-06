@@ -21,8 +21,16 @@ public class User {
     private String email;
     private  String managerRef;
 
-
-
-
 }
+
+//public class PersonInfoChange {
+//    private String firstName;
+//    private String lastName;
+//    private String userType;
+//    private String userName;
+//}
+//
+//public class UserManagerRefChange {
+//    private String managerRef;
+//}
 

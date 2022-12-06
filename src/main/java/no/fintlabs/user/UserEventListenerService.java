@@ -23,7 +23,9 @@ public class UserEventListenerService {
     public UserEventListenerService(
             FintCache<String, PersonalressursResource> personalressursResourceCache,
             FintCache<String, PersonResource> personResourceCache,
-            FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache, FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache, UserService userService) {
+            FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache,
+            FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache,
+            UserService userService) {
         this.personalressursResourceCache = personalressursResourceCache;
         this.personResourceCache = personResourceCache;
         this.arbeidsforholdResourceCache = arbeidsforholdResourceCache;
@@ -31,8 +33,7 @@ public class UserEventListenerService {
         this.userService = userService;
 
         personResourceCache.addEventListener(new FintEhCacheEventListener<>() {
-
-            //public void onEvent(FintCacheEvent<String, PersonResource> event) {
+            @Override
             public void onEvent(FintCacheEvent<String, PersonResource> event) {
                 onPersonEvent(event);
             }
@@ -43,33 +44,40 @@ public class UserEventListenerService {
                 onPersonalressursEvent(event);
             }
         });
-//        arbeidsforholdResourceCache.addEventListener((FintEhCacheEventListener) (event)->{
-//            onArbeidsforholdResourceEvent(event);
-//        });
-//        organisasjonselementResourceCache.addEventListener((FintEhCacheEventListener) (event)->{
-//            onOrganisasjonselementResourceEvent(event);
-//        });
+        arbeidsforholdResourceCache.addEventListener(new FintEhCacheEventListener<>(){
+            @Override
+            public void onEvent(FintCacheEvent<String, ArbeidsforholdResource> event) {
+                onArbeidsforholdResourceEvent(event);
+            }
+        });
+        organisasjonselementResourceCache.addEventListener(new FintEhCacheEventListener<>(){
+
+            @Override
+            public void onEvent(FintCacheEvent<String, OrganisasjonselementResource> event) {
+
+            }
+        });
     }
-//
-//    private void onOrganisasjonselementResourceEvent(FintCacheEvent<String,OrganisasjonselementResource> cacheEvent) {
-//        OrganisasjonselementResource organisasjonselementResource = cacheEvent.getNewValue();
-//        String organisasjonselementressursHref = ResourceLinkUtil.getFirstLink(
-//                organisasjonselementResource::getLeder,
-//                organisasjonselementResource,
-//                "leder"
-//        );
-//    }
-//
-//    private void onArbeidsforholdResourceEvent(FintCacheEvent<String,ArbeidsforholdResource> cacheEvent) {
-//        ArbeidsforholdResource arbeidsforholdResource = cacheEvent.getNewValue();
-//        String arbeidsforholdressursHref = ResourceLinkUtil.getFirstLink(
-//                arbeidsforholdResource::getArbeidssted,
-//                arbeidsforholdResource,
-//                "arbeidssted"
-//        );
-//        arbeidsforholdResourceCache.getOptional(arbeidsforholdressursHref)
-//                .ifPresent();
-//    }
+
+    private void onOrganisasjonselementResourceEvent(FintCacheEvent<String,OrganisasjonselementResource> cacheEvent) {
+        OrganisasjonselementResource organisasjonselementResource = cacheEvent.getNewValue();
+        String organisasjonselementressursHref = ResourceLinkUtil.getFirstLink(
+                organisasjonselementResource::getLeder,
+                organisasjonselementResource,
+                "leder"
+        );
+    }
+
+    private void onArbeidsforholdResourceEvent(FintCacheEvent<String,ArbeidsforholdResource> cacheEvent) {
+        ArbeidsforholdResource arbeidsforholdResource = cacheEvent.getNewValue();
+        String arbeidsforholdressursHref = ResourceLinkUtil.getFirstLink(
+                arbeidsforholdResource::getArbeidssted,
+                arbeidsforholdResource,
+                "arbeidssted"
+        );
+        arbeidsforholdResourceCache.getOptional(arbeidsforholdressursHref)
+                .ifPresent();
+    }
 
 
     public void onPersonEvent(FintCacheEvent<String, PersonResource> cacheEvent) {
