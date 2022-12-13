@@ -1,11 +1,10 @@
 package no.fintlabs.user;
 
-import org.springframework.context.annotation.Bean;
-
 public class UserUtils {
 
-    public enum userType{
+    public enum UserType {
         EMPLOYEE,
-        STUDENT;
+        STUDENT
     }
+
 }
