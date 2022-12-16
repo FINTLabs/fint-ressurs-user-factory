@@ -9,20 +9,17 @@ import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.links.ResourceLinkUtil;
+import no.fintlabs.user.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.kafka.listener.CommonLoggingErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 @Configuration
-@DependsOn("userEventListenerService")
-public class EmployeeResourceEntityConsumersConfiguration {
+public class EntityConsumersConfiguration {
 
     private final EntityConsumerFactoryService entityConsumerFactoryService;
 
-
-    public EmployeeResourceEntityConsumersConfiguration(EntityConsumerFactoryService entityConsumerFactoryService) {
+    public EntityConsumersConfiguration(EntityConsumerFactoryService entityConsumerFactoryService) {
         this.entityConsumerFactoryService = entityConsumerFactoryService;
     }
 
@@ -36,8 +33,7 @@ public class EmployeeResourceEntityConsumersConfiguration {
                 consumerRecord -> cache.put(
                         ResourceLinkUtil.getSelfLinks(consumerRecord.value()),
                         consumerRecord.value()
-                ),
-                new CommonLoggingErrorHandler()
+                )
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
 
@@ -65,8 +61,8 @@ public class EmployeeResourceEntityConsumersConfiguration {
 
     @Bean
     ConcurrentMessageListenerContainer<String, OrganisasjonselementResource> organisasjonselementResourceEntityConsumer(
-            FintCache<String,OrganisasjonselementResource> organisasjonselementResourceCache
-    ){
+            FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache
+    ) {
         return createCacheConsumer(
                 "administrasjon.organisasjon.organisasjonselement",
                 OrganisasjonselementResource.class,
@@ -76,13 +72,26 @@ public class EmployeeResourceEntityConsumersConfiguration {
 
     @Bean
     ConcurrentMessageListenerContainer<String, ArbeidsforholdResource> arbeidsforholdResourceEntityConsumer(
-            FintCache<String,ArbeidsforholdResource> arbeidsforholdResourceCache
-    ){
+            FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache
+    ) {
         return createCacheConsumer(
                 "administrasjon.personal.arbeidsforhold",
                 ArbeidsforholdResource.class,
                 arbeidsforholdResourceCache
         );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, User> userEntityConsumer(
+            FintCache<String, Integer> publishedUserHashCache
+    ) {
+        return entityConsumerFactoryService.createFactory(
+                User.class,
+                consumerRecord -> publishedUserHashCache.put(
+                        consumerRecord.value().getResourceId(),
+                        consumerRecord.value().hashCode()
+                )
+        ).createContainer(EntityTopicNameParameters.builder().resource("user").build());
     }
 
 }

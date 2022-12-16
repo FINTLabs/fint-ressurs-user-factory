@@ -30,6 +30,7 @@ public class ArbeidsforholdService {
         List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase)
                 .map(arbeidsforholdResourceCache::getOptional)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -64,12 +65,15 @@ public class ArbeidsforholdService {
     }
 
     public Optional<String> getLederHref(ArbeidsforholdResource arbeidsforhold, Date currentTime) {
-        OrganisasjonselementResource arbeidssted = getArbeidssted(arbeidsforhold, currentTime)
-                .orElseThrow();
-        return arbeidssted.getLeder()
+        Optional<OrganisasjonselementResource> arbeidsstedOptional = getArbeidssted(arbeidsforhold, currentTime);
+        if (arbeidsstedOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        return arbeidsstedOptional.get().getLeder()
                 .stream()
                 .findFirst()
-                .map(Link::getHref);
+                .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase);
     }
 
     private Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -35,18 +36,29 @@ public class UserPublishingComponent {
         this.userEntityProducerService = userEntityProducerService;
     }
 
-    @Scheduled(initialDelay = 5000L, fixedDelay = 20000L)
-    public void doSomething() {
+    @Scheduled(
+            initialDelayString = "${fint.kontroll.user.publishing.initial-delay}",
+            fixedDelayString = "${fint.kontroll.user.publishing.fixed-delay}"
+    )
+    public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-        personalressursService.getAllValid(currentTime)
+
+        List<User> validUsers = personalressursService.getAllValid(currentTime)
                 .stream()
-                .map(personalressursResource -> createUser(personalressursResource, currentTime));
-        // TODO: 06/12/2022
-        //  Cache entities on topic, with key as key and hash of content as value
-        //  For each:
-        //      check if already published on event topic (compare hash)
-        //      publish if not already published
-        //  compare keys from current users to published users, delete diff
+                .map(personalressursResource -> createUser(personalressursResource, currentTime))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(validUsers);
+
+        log.info("Published {} of {} valid users", publishedUsers.size(), validUsers.size());
+        log.debug("Ids of published users: {}",
+                publishedUsers.stream()
+                        .map(User::getResourceId)
+                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
+                        .toList()
+        );
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {

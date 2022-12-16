@@ -16,14 +16,16 @@ public class ResourceLinkUtil {
         return resource.getSelfLinks()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> NoSuchLinkException.noSelfLink(resource))
-                .getHref();
+                .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase)
+                .orElseThrow(() -> NoSuchLinkException.noSelfLink(resource));
     }
 
     public static List<String> getSelfLinks(FintLinks resource) {
         return resource.getSelfLinks()
                 .stream()
                 .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase)
                 .collect(Collectors.toList());
     }
 
@@ -32,7 +34,12 @@ public class ResourceLinkUtil {
                 .map(Collection::stream)
                 .flatMap(Stream::findFirst)
                 .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase)
                 .orElseThrow(() -> NoSuchLinkException.noLink(resource, linkedResourceName));
+    }
+
+    public static String systemIdToLowerCase(String path) {
+        return path.replace("systemId", "systemid");
     }
 
 }
