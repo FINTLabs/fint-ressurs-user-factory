@@ -1,33 +1,51 @@
 package no.fintlabs.user;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.cache.FintCacheEventListener;
+import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityProducer;
 import no.fintlabs.kafka.entity.EntityProducerFactory;
 import no.fintlabs.kafka.entity.EntityProducerRecord;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
+import no.fintlabs.kafka.entity.topic.EntityTopicService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
 public class UserEntityProducerService {
+    private final FintCache<String, Integer> publishedUserHashCache;
     private final EntityProducer<User> entityProducer;
     private final EntityTopicNameParameters entityTopicNameParameters;
 
-    public UserEntityProducerService( EntityProducerFactory entityProducerFactory){
-
+    public UserEntityProducerService(
+            EntityProducerFactory entityProducerFactory,
+            EntityTopicService entityTopicService,
+            FintCache<String, Integer> publishedUserHashCache
+    ) {
+        this.publishedUserHashCache = publishedUserHashCache;
         entityProducer = entityProducerFactory.createProducer(User.class);
         entityTopicNameParameters = EntityTopicNameParameters
                 .builder()
-                .resource("entityToUser")
+                .resource("user")
                 .build();
-
+        entityTopicService.ensureTopic(entityTopicNameParameters, 0);
     }
 
+    public List<User> publishChangedUsers(List<User> users) {
+        return users
+                .stream()
+                .filter(user -> publishedUserHashCache
+                        .getOptional(user.getResourceId())
+                        .map(publishedUserHash -> publishedUserHash != user.hashCode())
+                        .orElse(true)
+                )
+                .peek(this::publishChangedUsers)
+                .toList();
+    }
 
-
-    public void publish(User user) {
-        String key = user.getUserId();
+    private void publishChangedUsers(User user) {
+        String key = user.getResourceId();
         entityProducer.send(
                 EntityProducerRecord.<User>builder()
                         .topicNameParameters(entityTopicNameParameters)

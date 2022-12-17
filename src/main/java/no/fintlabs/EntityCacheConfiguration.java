@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Locale;
 
 @Configuration
-public class ResourceEntityCacheConfiguration {
+public class EntityCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
 
-    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
+    public EntityCacheConfiguration(FintCacheManager fintCacheManager) {
         this.fintCacheManager = fintCacheManager;
     }
 
@@ -40,6 +40,10 @@ public class ResourceEntityCacheConfiguration {
         return createCache(ArbeidsforholdResource.class);
     }
 
+    @Bean
+    FintCache<String, Integer> publishedUserHashCache() {
+        return createCache(Integer.class);
+    }
 
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {
         return fintCacheManager.createCache(
