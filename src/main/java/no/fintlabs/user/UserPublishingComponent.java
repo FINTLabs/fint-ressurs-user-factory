@@ -69,7 +69,7 @@ public class UserPublishingComponent {
         }
 
         Optional<ArbeidsforholdResource> arbeidsforholdOptional =
-                arbeidsforholdService.getMainArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
+                arbeidsforholdService.getArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
         if (arbeidsforholdOptional.isEmpty()) {
             return Optional.empty();
         }

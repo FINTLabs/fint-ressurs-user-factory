@@ -27,7 +27,7 @@ public class ArbeidsforholdService {
         this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
-    public Optional<ArbeidsforholdResource> getMainArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
+    public Optional<ArbeidsforholdResource> getArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
         List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
