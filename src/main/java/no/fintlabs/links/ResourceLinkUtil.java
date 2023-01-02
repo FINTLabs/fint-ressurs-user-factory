@@ -38,6 +38,14 @@ public class ResourceLinkUtil {
                 .orElseThrow(() -> NoSuchLinkException.noLink(resource, linkedResourceName));
     }
 
+    public static Optional<String> getOptionalFirstLink(Supplier<List<Link>> linkProducer) {
+        return Optional.ofNullable(linkProducer.get())
+                .map(Collection::stream)
+                .flatMap(Stream::findFirst)
+                .map(Link::getHref)
+                .map(ResourceLinkUtil::systemIdToLowerCase);
+    }
+
     public static String systemIdToLowerCase(String path) {
         return path.replace("systemId", "systemid");
     }

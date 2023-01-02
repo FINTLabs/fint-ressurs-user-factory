@@ -2,6 +2,7 @@ package no.fintlabs.user;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
@@ -69,19 +70,29 @@ public class UserPublishingComponent {
         }
 
         Optional<ArbeidsforholdResource> arbeidsforholdOptional =
-                arbeidsforholdService.getMainArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
+                arbeidsforholdService.getArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
         if (arbeidsforholdOptional.isEmpty()) {
             return Optional.empty();
         }
 
-        Optional<String> lederPersonalressursLinkOptional =
-                arbeidsforholdService.getLederHref(arbeidsforholdOptional.get(), currentTime);
+        Optional<OrganisasjonselementResource> arbeidsstedOptional = arbeidsforholdOptional
+                .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
+        if (arbeidsstedOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
+                .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
+        if (lederPersonalressursLinkOptional.isEmpty()) {
+            return Optional.empty();
+        }
 
         return Optional.of(
                 createUser(
                         personalressursResource,
                         personResourceOptional.get(),
-                        lederPersonalressursLinkOptional.orElse(null)
+                        lederPersonalressursLinkOptional.get(),
+                        arbeidsstedOptional.get().getOrganisasjonsnavn()
                 )
         );
     }
@@ -89,7 +100,8 @@ public class UserPublishingComponent {
     private User createUser(
             PersonalressursResource personalressursResource,
             PersonResource personResource,
-            String lederPersonalressursHref
+            String lederPersonalressursHref,
+            String organisasjonsnavn
     ) {
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
@@ -101,6 +113,7 @@ public class UserPublishingComponent {
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
+                .organisationUnitName(organisasjonsnavn)
                 .mobilePhone(mobilePhone)
                 .managerRef(lederPersonalressursHref)
                 .build();

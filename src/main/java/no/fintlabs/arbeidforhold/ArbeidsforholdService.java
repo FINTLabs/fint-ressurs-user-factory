@@ -27,7 +27,7 @@ public class ArbeidsforholdService {
         this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
-    public Optional<ArbeidsforholdResource> getMainArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
+    public Optional<ArbeidsforholdResource> getArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
         List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
@@ -65,27 +65,17 @@ public class ArbeidsforholdService {
         );
     }
 
-    public Optional<String> getLederHref(ArbeidsforholdResource arbeidsforhold, Date currentTime) {
-        Optional<OrganisasjonselementResource> arbeidsstedOptional = getArbeidssted(arbeidsforhold, currentTime);
-        if (arbeidsstedOptional.isEmpty()) {
-            return Optional.empty();
-        }
-        return arbeidsstedOptional.get().getLeder()
-                .stream()
-                .findFirst()
-                .map(Link::getHref)
-                .map(ResourceLinkUtil::systemIdToLowerCase);
+    public Optional<String> getLederHref(OrganisasjonselementResource arbeidssted) {
+        return ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder);
     }
 
-    private Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
-        return organisasjonselementResourceCache
-                .getOptional(
-                        ResourceLinkUtil.getFirstLink(
-                                arbeidsforholdResource::getArbeidssted,
-                                arbeidsforholdResource,
-                                "Arbeidssted"
-                        )
-                )
+    public Optional<String> getOrganisasjonsnavn(OrganisasjonselementResource arbeidssted) {
+        return Optional.ofNullable(arbeidssted.getOrganisasjonsnavn());
+    }
+
+    public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
+        return ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
+                .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
                         gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime));
     }
