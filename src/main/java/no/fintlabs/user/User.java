@@ -15,7 +15,7 @@ public class User {
     private String userType;
     private String userName;
     private UUID identityProviderUserObjectId;
-    private String organisation;
+    private String organisationUnitName;
     private String mobilePhone;
     private String email;
     private  String managerRef;
