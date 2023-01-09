@@ -106,13 +106,10 @@ public class UserPublishingComponent {
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
-        String resourceIdHref = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
-        String[] resourceIdHrefParts = resourceIdHref.split("/");
-        String resourceId = resourceIdHrefParts[resourceIdHrefParts.length-1];
 
         return User
                 .builder()
-                .resourceId(resourceId)
+                .resourceId(ResourceLinkUtil.getFirstSelfLink(personalressursResource))
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
