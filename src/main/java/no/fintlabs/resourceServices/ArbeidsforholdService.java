@@ -1,4 +1,4 @@
-package no.fintlabs.services;
+package no.fintlabs.resourceServices;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
