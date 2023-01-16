@@ -2,6 +2,7 @@ package no.fintlabs.user;
 
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.services.GyldighetsperiodeService;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

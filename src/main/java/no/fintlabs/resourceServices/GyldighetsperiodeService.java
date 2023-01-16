@@ -1,4 +1,4 @@
-package no.fintlabs.user;
+package no.fintlabs.services;
 
 import no.fint.model.felles.kompleksedatatyper.Periode;
 import org.springframework.stereotype.Service;

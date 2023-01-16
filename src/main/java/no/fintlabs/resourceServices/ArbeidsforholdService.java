@@ -1,11 +1,10 @@
-package no.fintlabs.arbeidforhold;
+package no.fintlabs.services;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.links.ResourceLinkUtil;
-import no.fintlabs.user.GyldighetsperiodeService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
