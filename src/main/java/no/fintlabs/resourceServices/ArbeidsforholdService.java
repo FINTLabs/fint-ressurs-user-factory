@@ -26,7 +26,10 @@ public class ArbeidsforholdService {
         this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
-    public Optional<ArbeidsforholdResource> getArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
+    public Optional<ArbeidsforholdResource> getArbeidsforhold(
+            Collection<Link> arbeidsforholdLinks,
+            Date currentTime
+    ) {
         List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
@@ -39,7 +42,8 @@ public class ArbeidsforholdService {
                 .or(() -> getValidNonMainArbeidsforhold(arbeidsforholdResources, currentTime));
     }
 
-    private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
+    private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(
+            List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
         return arbeidsforholdResources
                 .stream()
                 .filter(ArbeidsforholdResource::getHovedstilling)
@@ -47,7 +51,8 @@ public class ArbeidsforholdService {
                 .findFirst();
     }
 
-    private Optional<ArbeidsforholdResource> getValidNonMainArbeidsforhold(List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
+    private Optional<ArbeidsforholdResource> getValidNonMainArbeidsforhold(
+            List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
         return arbeidsforholdResources
                 .stream()
                 .filter(arbeidsforholdResource -> !arbeidsforholdResource.getHovedstilling())
