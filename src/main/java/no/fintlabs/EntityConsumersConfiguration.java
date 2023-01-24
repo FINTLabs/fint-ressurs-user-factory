@@ -5,6 +5,8 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
+import no.fint.model.resource.utdanning.elev.ElevResource;
+import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
@@ -78,6 +80,39 @@ public class EntityConsumersConfiguration {
                 "administrasjon.personal.arbeidsforhold",
                 ArbeidsforholdResource.class,
                 arbeidsforholdResourceCache
+        );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, ElevResource> elevResourceEntityConsumer(
+            FintCache<String,ElevResource> elevResourceCache
+    ){
+        return createCacheConsumer(
+                "utdanning.elev.elev",
+                ElevResource.class,
+                elevResourceCache
+        );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, PersonResource> personResourceUtdanningEntityConsumer(
+            FintCache<String, PersonResource> personResourceCache
+    ){
+        return createCacheConsumer(
+                "utdanning.elev.person",
+                PersonResource.class,
+                personResourceCache
+        );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, ElevforholdResource> elevforholdResourceEntityConsumer(
+            FintCache<String, ElevforholdResource> elevforholdResourceCache
+    ){
+        return createCacheConsumer(
+                "utdanning.elev.elevforhold",
+                ElevforholdResource.class,
+                elevforholdResourceCache
         );
     }
 

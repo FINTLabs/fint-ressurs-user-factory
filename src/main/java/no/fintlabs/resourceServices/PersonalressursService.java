@@ -1,4 +1,4 @@
-package no.fintlabs.user;
+package no.fintlabs.resourceServices;
 
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fintlabs.cache.FintCache;

@@ -6,8 +6,10 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
-import no.fintlabs.arbeidforhold.ArbeidsforholdService;
+import no.fintlabs.resourceServices.ArbeidsforholdService;
 import no.fintlabs.links.ResourceLinkUtil;
+import no.fintlabs.resourceServices.PersonService;
+import no.fintlabs.resourceServices.PersonalressursService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

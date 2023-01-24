@@ -1,11 +1,10 @@
-package no.fintlabs.arbeidforhold;
+package no.fintlabs.resourceServices;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.links.ResourceLinkUtil;
-import no.fintlabs.user.GyldighetsperiodeService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,7 +26,10 @@ public class ArbeidsforholdService {
         this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
-    public Optional<ArbeidsforholdResource> getArbeidsforhold(Collection<Link> arbeidsforholdLinks, Date currentTime) {
+    public Optional<ArbeidsforholdResource> getArbeidsforhold(
+            Collection<Link> arbeidsforholdLinks,
+            Date currentTime
+    ) {
         List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
@@ -40,7 +42,8 @@ public class ArbeidsforholdService {
                 .or(() -> getValidNonMainArbeidsforhold(arbeidsforholdResources, currentTime));
     }
 
-    private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
+    private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(
+            List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
         return arbeidsforholdResources
                 .stream()
                 .filter(ArbeidsforholdResource::getHovedstilling)
@@ -48,7 +51,8 @@ public class ArbeidsforholdService {
                 .findFirst();
     }
 
-    private Optional<ArbeidsforholdResource> getValidNonMainArbeidsforhold(List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
+    private Optional<ArbeidsforholdResource> getValidNonMainArbeidsforhold(
+            List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
         return arbeidsforholdResources
                 .stream()
                 .filter(arbeidsforholdResource -> !arbeidsforholdResource.getHovedstilling())

@@ -42,6 +42,7 @@ public class UserEntityProducerService {
                 )
                 .peek(this::publishChangedUsers)
                 .toList();
+
     }
 
     private void publishChangedUsers(User user) {
