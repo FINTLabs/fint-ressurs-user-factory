@@ -96,12 +96,12 @@ public class EntityConsumersConfiguration {
 
     @Bean
     ConcurrentMessageListenerContainer<String, PersonResource> personResourceUtdanningEntityConsumer(
-            FintCache<String, PersonResource> personResourceUtdanningCache
+            FintCache<String, PersonResource> personResourceCache
     ){
         return createCacheConsumer(
                 "utdanning.elev.person",
                 PersonResource.class,
-                personResourceUtdanningCache
+                personResourceCache
         );
     }
 

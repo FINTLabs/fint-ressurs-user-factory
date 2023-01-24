@@ -48,15 +48,9 @@ public class EntityCacheConfiguration {
     }
 
     @Bean
-    FintCache<String, PersonResource> personResourceUtdanningCache() {
-        return createCache(PersonResource.class);
-    }
-
-    @Bean
     FintCache<String, ElevforholdResource> elevforholdResourceCache(){
         return createCache(ElevforholdResource.class);
     }
-
 
 
     @Bean
