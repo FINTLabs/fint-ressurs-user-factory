@@ -30,17 +30,28 @@ public class ArbeidsforholdService {
             Collection<Link> arbeidsforholdLinks,
             Date currentTime
     ) {
-        List<ArbeidsforholdResource> arbeidsforholdResources = arbeidsforholdLinks
-                .stream()
-                .map(Link::getHref)
-                .map(ResourceLinkUtil::systemIdToLowerCase)
-                .map(arbeidsforholdResourceCache::getOptional)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-        return getValidMainArbeidsforhold(arbeidsforholdResources, currentTime)
-                .or(() -> getValidNonMainArbeidsforhold(arbeidsforholdResources, currentTime));
+        List<ArbeidsforholdResource> allValidArbeidsresurser = getAllValidArbeidsforholdAsList(arbeidsforholdLinks,
+                currentTime);
+        return getValidMainArbeidsforhold(allValidArbeidsresurser, currentTime)
+                .or(() -> getValidNonMainArbeidsforhold(allValidArbeidsresurser, currentTime));
     }
+
+    public List<ArbeidsforholdResource> getAllValidArbeidsforholdAsList(
+            Collection<Link> arbeidsforholdLinks,
+            Date currenTime
+    ){
+
+        return arbeidsforholdLinks
+            .stream()
+            .map(Link::getHref)
+            .map(ResourceLinkUtil::systemIdToLowerCase)
+            .map(arbeidsforholdResourceCache::getOptional)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+                .filter(arbeidsforholdResource -> isValid(arbeidsforholdResource,currenTime))
+            .toList();
+    }
+
 
     private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(
             List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime) {
@@ -69,19 +80,28 @@ public class ArbeidsforholdService {
         );
     }
 
-    public Optional<String> getLederHref(OrganisasjonselementResource arbeidssted) {
-        return ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder);
+    public List<Optional<OrganisasjonselementResource>> getAllArbeidssteder(List<ArbeidsforholdResource> arbeidsforholdResourceList,
+                                                                            Date currentTime){
+        return arbeidsforholdResourceList
+                .stream()
+                .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource,currentTime))
+                .toList();
     }
-
-    public Optional<String> getOrganisasjonsnavn(OrganisasjonselementResource arbeidssted) {
-        return Optional.ofNullable(arbeidssted.getOrganisasjonsnavn());
-    }
-
     public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
         return ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
                 .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
                         gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime));
     }
+
+
+
+//    public Optional<String> getLederHref(OrganisasjonselementResource arbeidssted) {
+//        return ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder);
+//    }
+//
+//    public Optional<String> getOrganisasjonsnavn(OrganisasjonselementResource arbeidssted) {
+//        return Optional.ofNullable(arbeidssted.getOrganisasjonsnavn());
+//    }
 
 }

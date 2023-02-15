@@ -46,8 +46,7 @@ public class UserPublishingComponent {
     )
     public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-
-        List<User> validUsers = personalressursService.getAllValid(currentTime)
+                List<User> validUsers = personalressursService.getAllValid(currentTime)
                 .stream()
                 .map(personalressursResource -> createUser(personalressursResource, currentTime))
                 .filter(Optional::isPresent)
@@ -66,6 +65,7 @@ public class UserPublishingComponent {
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
+
         Optional<PersonResource> personResourceOptional = personService.getPerson(personalressursResource);
         if (personResourceOptional.isEmpty()) {
             return Optional.empty();
@@ -83,18 +83,31 @@ public class UserPublishingComponent {
             return Optional.empty();
         }
 
+        List<ArbeidsforholdResource> additionalArbeidsforhold =
+                arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
+                        currentTime);
+        List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
+                arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold,currentTime);
+        List<String> additionalArbeidssteder = additionalOrgUnits
+                .stream()
+                .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
+                .toList();
+
+
         Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
-        if (lederPersonalressursLinkOptional.isEmpty()) {
-            return Optional.empty();
-        }
+//        if (lederPersonalressursLinkOptional.isEmpty()) {
+//            return Optional.empty();
+//        }
 
         return Optional.of(
                 createUser(
                         personalressursResource,
                         personResourceOptional.get(),
-                        lederPersonalressursLinkOptional.get(),
-                        arbeidsstedOptional.get().getOrganisasjonsnavn()
+                        lederPersonalressursLinkOptional.isEmpty()? "": lederPersonalressursLinkOptional.get(),
+                        arbeidsstedOptional.get().getOrganisasjonsnavn(),
+                        arbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi(),
+                        additionalArbeidssteder
                 )
         );
     }
@@ -103,7 +116,9 @@ public class UserPublishingComponent {
             PersonalressursResource personalressursResource,
             PersonResource personResource,
             String lederPersonalressursHref,
-            String organisasjonsnavn
+            String organisasjonsnavn,
+            String organisasjonsId,
+            List<String> additionalArbeidsteder
     ) {
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
@@ -115,7 +130,10 @@ public class UserPublishingComponent {
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
-                .organisationUnitName(organisasjonsnavn)
+                //.organisationUnitName(organisasjonsnavn)
+                .mainOrganisationUnitName(organisasjonsnavn)
+                .mainOrganisationUnitId(organisasjonsId)
+                .organisationUnitIds(additionalArbeidsteder)
                 .mobilePhone(mobilePhone)
                 .managerRef(lederPersonalressursHref)
                 .build();
