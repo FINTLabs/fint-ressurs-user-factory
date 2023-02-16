@@ -2,6 +2,8 @@ package no.fintlabs.user;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,7 +17,10 @@ public class User {
     private String userType;
     private String userName;
     private UUID identityProviderUserObjectId;
-    private String organisationUnitName;
+    //private String organisationUnitName;
+    private String mainOrganisationUnitName;
+    private String mainOrganisationUnitId;
+    private List<String> organisationUnitIds;
     private String mobilePhone;
     private String email;
     private  String managerRef;
