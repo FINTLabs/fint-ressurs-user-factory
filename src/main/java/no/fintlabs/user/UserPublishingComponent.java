@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -79,20 +80,22 @@ public class UserPublishingComponent {
 
         Optional<OrganisasjonselementResource> arbeidsstedOptional = arbeidsforholdOptional
                 .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
-        if (arbeidsstedOptional.isEmpty()) {
-            return Optional.empty();
+//        if (arbeidsstedOptional.isEmpty()) {
+//            return Optional.empty();
+//        }
+
+        List<String> additionalArbeidssteder = new ArrayList<>();
+        if (arbeidsstedOptional.isPresent()) {
+            List<ArbeidsforholdResource> additionalArbeidsforhold =
+                    arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
+                            currentTime);
+            List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
+                    arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
+            additionalArbeidssteder = additionalOrgUnits
+                    .stream()
+                    .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
+                    .toList();
         }
-
-        List<ArbeidsforholdResource> additionalArbeidsforhold =
-                arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
-                        currentTime);
-        List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
-                arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold,currentTime);
-        List<String> additionalArbeidssteder = additionalOrgUnits
-                .stream()
-                .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
-                .toList();
-
 
         Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
@@ -105,8 +108,10 @@ public class UserPublishingComponent {
                         personalressursResource,
                         personResourceOptional.get(),
                         lederPersonalressursLinkOptional.isEmpty()? "": lederPersonalressursLinkOptional.get(),
-                        arbeidsstedOptional.get().getOrganisasjonsnavn(),
-                        arbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi(),
+                        arbeidsstedOptional.isPresent()? arbeidsstedOptional.get().getOrganisasjonsnavn():"",
+                        arbeidsstedOptional.isPresent()?arbeidsstedOptional.get()
+                                .getOrganisasjonsId().getIdentifikatorverdi()
+                         :"",
                         additionalArbeidssteder
                 )
         );

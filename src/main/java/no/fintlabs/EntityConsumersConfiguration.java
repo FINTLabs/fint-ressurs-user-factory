@@ -116,6 +116,8 @@ public class EntityConsumersConfiguration {
         );
     }
 
+
+
     @Bean
     ConcurrentMessageListenerContainer<String, User> userEntityConsumer(
             FintCache<String, Integer> publishedUserHashCache

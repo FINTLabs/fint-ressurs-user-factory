@@ -2,6 +2,7 @@ package no.fintlabs.resourceServices;
 
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.links.ResourceLinkUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -25,6 +26,8 @@ public class PersonalressursService {
     public List<PersonalressursResource> getAllValid(Date currentTime) {
         return personalressursResourceCache.getAllDistinct()
                 .stream()
+                .peek(personalressursResource -> System.out.println("Behandler: " +ResourceLinkUtil.getFirstSelfLink(personalressursResource)))
+                .peek(personalressursResource -> System.out.println("Gyldighetsperiode: " +personalressursResource.getAnsettelsesperiode().toString()))
                 .filter(personalressursResource -> gyldighetsperiodeService.isValid(
                         personalressursResource.getAnsettelsesperiode(),
                         currentTime
