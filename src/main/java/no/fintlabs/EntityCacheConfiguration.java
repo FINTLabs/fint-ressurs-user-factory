@@ -53,6 +53,7 @@ public class EntityCacheConfiguration {
         return createCache(ElevforholdResource.class);
     }
 
+    @Bean
     FintCache<String, SkoleResource> skoleResourceCache() {return createCache(SkoleResource.class);}
 
 

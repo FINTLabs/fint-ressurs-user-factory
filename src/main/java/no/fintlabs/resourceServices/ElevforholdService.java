@@ -2,7 +2,9 @@ package no.fintlabs.resourceServices;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.links.ResourceLinkUtil;
 import org.springframework.stereotype.Service;
@@ -17,14 +19,19 @@ import java.util.Optional;
 public class ElevforholdService {
     private final GyldighetsperiodeService gyldighetsperiodeService;
     private final FintCache<String, ElevforholdResource> elevforholdResourceCache;
+    private final FintCache<String, SkoleResource> skoleResourceCache;
+    private final FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache;
 
     public ElevforholdService(
             GyldighetsperiodeService gyldighetsperiodeService,
 
-            FintCache<String, ElevforholdResource> elevforholdResourceCache) {
+            FintCache<String, ElevforholdResource> elevforholdResourceCache,
+            FintCache<String, SkoleResource> skoleResourceCache,
+            FintCache<String, OrganisasjonselementResource> organisasjonselementResourceCache) {
         this.gyldighetsperiodeService = gyldighetsperiodeService;
-
         this.elevforholdResourceCache = elevforholdResourceCache;
+        this.skoleResourceCache = skoleResourceCache;
+        this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
     public Optional<ElevforholdResource> getElevforhold(
@@ -49,11 +56,16 @@ public class ElevforholdService {
         return elevforholdResources
                 .stream()
                 .filter(elevforholdResource -> isValid(elevforholdResource,currentTime))
+                .filter(this::isHovedSkole)
                 .findFirst();
     }
 
 
-
+    private boolean isHovedSkole(ElevforholdResource elevforhold){
+        if (elevforhold.getHovedskole()){
+            return true;
+        }else return false;
+    }
     private boolean isValid(ElevforholdResource elevforholdResource, Date currentTime){
 
         if (elevforholdResource.getGyldighetsperiode() != null) {
@@ -64,4 +76,18 @@ public class ElevforholdService {
     }
 
 
+    public Optional<SkoleResource> getSkole(ElevforholdResource elevforhold, Date currentTime) {
+        String skoleHref = elevforhold.getSkole().get(0).getHref().toLowerCase();
+        Optional<SkoleResource> skoleResource = skoleResourceCache.getOptional(skoleHref);
+        if (skoleResource.isEmpty()){log.info("Fant ikke skole for " + skoleHref);}
+        return skoleResource;
+
+
+    }
+
+    public Optional<OrganisasjonselementResource> getSkoleOrgUnit(SkoleResource skoleResource, Date currentTime){
+        String skoleOrgUnitref = skoleResource.getOrganisasjon().get(0).getHref();
+        OrganisasjonselementResource organisasjonselementResource = organisasjonselementResourceCache.get(skoleOrgUnitref);
+        return Optional.ofNullable(organisasjonselementResource);
+    }
 }

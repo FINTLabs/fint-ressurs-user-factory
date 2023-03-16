@@ -47,7 +47,7 @@ public class ArbeidsforholdService {
             .map(ResourceLinkUtil::systemIdToLowerCase)
             .map(arbeidsforholdResourceCache::getOptional)
             .filter(Optional::isPresent)
-                .peek(arbeidsforholdResource -> System.out.println("Behandler arbforhold: " +arbeidsforholdResource.get().toString()))
+                //.peek(arbeidsforholdResource -> System.out.println("Behandler arbforhold: " +arbeidsforholdResource.get().toString()))
             .map(Optional::get)
                 .filter(arbeidsforholdResource -> isValid(arbeidsforholdResource,currenTime))
             .toList();
