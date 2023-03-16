@@ -26,8 +26,8 @@ public class PersonalressursService {
     public List<PersonalressursResource> getAllValid(Date currentTime) {
         return personalressursResourceCache.getAllDistinct()
                 .stream()
-                .peek(personalressursResource -> System.out.println("Behandler: " +ResourceLinkUtil.getFirstSelfLink(personalressursResource)))
-                .peek(personalressursResource -> System.out.println("Gyldighetsperiode: " +personalressursResource.getAnsettelsesperiode().toString()))
+                //.peek(personalressursResource -> System.out.println("Behandler: " +ResourceLinkUtil.getFirstSelfLink(personalressursResource)))
+        //.peek(personalressursResource -> System.out.println("Gyldighetsperiode: " +personalressursResource.getAnsettelsesperiode().toString()))
                 .filter(personalressursResource -> gyldighetsperiodeService.isValid(
                         personalressursResource.getAnsettelsesperiode(),
                         currentTime

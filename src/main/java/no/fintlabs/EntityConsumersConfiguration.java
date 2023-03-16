@@ -7,6 +7,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
@@ -116,7 +117,16 @@ public class EntityConsumersConfiguration {
         );
     }
 
-
+    @Bean
+    ConcurrentMessageListenerContainer<String, SkoleResource> skoleResourceEntityConsumer(
+            FintCache<String,SkoleResource> skoleResourceCache
+    ){
+        return createCacheConsumer(
+                "utdanning.utdanningsprogram.skole",
+                SkoleResource.class,
+                skoleResourceCache
+        );
+    }
 
     @Bean
     ConcurrentMessageListenerContainer<String, User> userEntityConsumer(

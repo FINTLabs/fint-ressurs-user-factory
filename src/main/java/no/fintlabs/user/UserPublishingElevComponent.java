@@ -2,10 +2,14 @@ package no.fintlabs.user;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
+import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.resourceServices.ElevService;
+import no.fintlabs.resourceServices.ElevforholdService;
 import no.fintlabs.resourceServices.PersonUtdanningService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,15 +24,16 @@ import java.util.Optional;
 public class UserPublishingElevComponent {
     private final ElevService elevService;
     private final PersonUtdanningService personUtdanningService;
+    private final ElevforholdService elevforholdService;
     private final UserEntityProducerService userEntityProducerService;
 
     public UserPublishingElevComponent(
             ElevService elevService,
             PersonUtdanningService personUtdanningService,
-            UserEntityProducerService userEntityProducerService
-    ){
+            ElevforholdService elevforholdService, UserEntityProducerService userEntityProducerService){
         this.elevService = elevService;
         this.personUtdanningService = personUtdanningService;
+        this.elevforholdService = elevforholdService;
         this.userEntityProducerService = userEntityProducerService;
     }
 
@@ -65,14 +70,42 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
+        Optional<ElevforholdResource> elevforholdOptional =
+                elevforholdService.getElevforhold(elevResource.getElevforhold(),currentTime);
+        if (elevforholdOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<SkoleResource> skoleOptional = elevforholdOptional
+                .flatMap(elevforhold -> elevforholdService.getSkole(elevforhold,currentTime));
+        if (skoleOptional.isEmpty()){
+            return Optional.empty();
+        }
+
+        Optional<OrganisasjonselementResource> skoleOrgUnitOptional = skoleOptional
+                .flatMap(skole -> elevforholdService.getSkoleOrgUnit(skole,currentTime));
+        if (skoleOrgUnitOptional.isEmpty()){
+            return Optional.empty();
+        }
+
         return Optional.of(
-                createUser(elevResource,personResourceOptional.get())
+                createUser(
+                        elevResource,
+                        personResourceOptional.get(),
+                        skoleOrgUnitOptional.isPresent()?
+                                skoleOrgUnitOptional.get().getOrganisasjonsnavn():"",
+                        skoleOrgUnitOptional.isPresent()?
+                                skoleOrgUnitOptional.get().getOrganisasjonsId().getIdentifikatorverdi():""
+                )
+
         );
     }
 
     private User createUser(
             ElevResource elevResource,
-            PersonResource personResource
+            PersonResource personResource,
+            String organisasjonsnavn,
+            String organisasjonsId
     ){
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
@@ -82,6 +115,8 @@ public class UserPublishingElevComponent {
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.STUDENT))
+                .mainOrganisationUnitName(organisasjonsnavn)
+                .mainOrganisationUnitId(organisasjonsId)
                 .mobilePhone(mobilePhone)
                 .build();
     }

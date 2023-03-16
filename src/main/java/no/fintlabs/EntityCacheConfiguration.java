@@ -6,6 +6,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +52,9 @@ public class EntityCacheConfiguration {
     FintCache<String, ElevforholdResource> elevforholdResourceCache(){
         return createCache(ElevforholdResource.class);
     }
+
+    @Bean
+    FintCache<String, SkoleResource> skoleResourceCache() {return createCache(SkoleResource.class);}
 
 
     @Bean

@@ -109,9 +109,7 @@ public class UserPublishingComponent {
                         personResourceOptional.get(),
                         lederPersonalressursLinkOptional.isEmpty()? "": lederPersonalressursLinkOptional.get(),
                         arbeidsstedOptional.isPresent()? arbeidsstedOptional.get().getOrganisasjonsnavn():"",
-                        arbeidsstedOptional.isPresent()?arbeidsstedOptional.get()
-                                .getOrganisasjonsId().getIdentifikatorverdi()
-                         :"",
+                        arbeidsstedOptional.isPresent()?arbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"",
                         additionalArbeidssteder
                 )
         );
@@ -135,7 +133,6 @@ public class UserPublishingComponent {
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
-                //.organisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
                 .organisationUnitIds(additionalArbeidsteder)
