@@ -17,7 +17,6 @@ public class User {
     private String userType;
     private String userName;
     private UUID identityProviderUserObjectId;
-    //private String organisationUnitName;
     private String mainOrganisationUnitName;
     private String mainOrganisationUnitId;
     private List<String> organisationUnitIds;
