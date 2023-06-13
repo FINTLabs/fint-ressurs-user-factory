@@ -1,14 +1,18 @@
 fint:
   org-id: fintlabs.no
-  flyt:
-    resource-gateway:
-      authorization:
-        enable: true
   client:
     base-url: https://beta.felleskomponent.no
   kafka:
     default-replicas: 1
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ${fint.application-id}
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://idp.felleskomponent.no/nidp/oauth/nam
   kafka:
     bootstrap-servers: localhost:9092
 server:
