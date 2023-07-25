@@ -107,11 +107,15 @@ public class UserPublishingElevComponent {
             String organisasjonsnavn,
             String organisasjonsId
     ){
+
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(elevResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") + 1);
+
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
         return User.builder()
-                .resourceId(ResourceLinkUtil.getFirstSelfLink(elevResource))
+                .resourceId(resourceId)
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.STUDENT))
