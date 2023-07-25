@@ -15,10 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -134,6 +131,8 @@ public class UserPublishingComponent {
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
+        Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+
         return User
                 .builder()
                 .resourceId(resourceId)
@@ -145,6 +144,9 @@ public class UserPublishingComponent {
                 .organisationUnitIds(additionalArbeidsteder)
                 .mobilePhone(mobilePhone)
                 .managerRef(lederPersonalressursHref)
+                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
+                .email(azureUserAttributes.getOrDefault("email",""))
+                .userName(azureUserAttributes.getOrDefault("userName",""))
                 .build();
     }
 
