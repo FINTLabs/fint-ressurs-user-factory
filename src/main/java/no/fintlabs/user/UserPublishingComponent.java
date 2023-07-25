@@ -6,6 +6,7 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
+import no.fintlabs.azureUser.AzureUserService;
 import no.fintlabs.resourceServices.ArbeidsforholdService;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.resourceServices.PersonService;
@@ -25,6 +26,7 @@ public class UserPublishingComponent {
 
     private final PersonService personService;
     private final PersonalressursService personalressursService;
+    private final AzureUserService azureUserService;
     private final ArbeidsforholdService arbeidsforholdService;
 
     private final UserEntityProducerService userEntityProducerService;
@@ -33,11 +35,13 @@ public class UserPublishingComponent {
             PersonService personService,
             PersonalressursService personalressursService,
             ArbeidsforholdService arbeidsforholdService,
+            AzureUserService azureUserService,
             UserEntityProducerService userEntityProducerService
     ) {
         this.personService = personService;
         this.personalressursService = personalressursService;
         this.arbeidsforholdService = arbeidsforholdService;
+        this.azureUserService = azureUserService;
         this.userEntityProducerService = userEntityProducerService;
     }
 

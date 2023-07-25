@@ -10,20 +10,20 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 public class AzureUserConsumerConfiguration {
 
-    @Bean
-    public ConcurrentMessageListenerContainer<String, AzureUser> azureUserConsumer(
-            AzureUserService azureUserService,
-            EntityConsumerFactoryService entityConsumerFactoryService
-    ){
-        EntityTopicNameParameters entityTopicNameParameters = EntityTopicNameParameters
-                .builder()
-                .resource("azureuser")
-                .build();
-
-        return entityConsumerFactoryService.createFactory(
-                AzureUser.class,
-                (ConsumerRecord<String,AzureUser> consumerRecord)
-                -> azureUserService.updateUserEntity(consumerRecord.value()))
-                .createContainer(entityTopicNameParameters);
-    }
+//    @Bean
+//    public ConcurrentMessageListenerContainer<String, AzureUser> azureUserConsumer(
+//            AzureUserService azureUserService,
+//            EntityConsumerFactoryService entityConsumerFactoryService
+//    ){
+//        EntityTopicNameParameters entityTopicNameParameters = EntityTopicNameParameters
+//                .builder()
+//                .resource("azureuser")
+//                .build();
+//
+//        return entityConsumerFactoryService.createFactory(
+//                AzureUser.class,
+//                (ConsumerRecord<String,AzureUser> consumerRecord)
+//                -> azureUserService.updateUserEntity(consumerRecord.value()))
+//                .createContainer(entityTopicNameParameters);
+//    }
 }
