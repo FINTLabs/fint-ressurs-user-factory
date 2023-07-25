@@ -22,4 +22,5 @@ server:
   port: 8088
 logging:
   level:
-    no.fintlabs.user.UserPublishingComponent: DEBUG
+    #no.fintlabs.user.UserPublishingComponent: DEBUG
+    no.fintlabs: DEBUG

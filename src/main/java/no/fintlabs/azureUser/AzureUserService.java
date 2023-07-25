@@ -32,9 +32,10 @@ public class AzureUserService {
             azureUserAttributes.put("email", azureUser.getMail());
             azureUserAttributes.put("userName", azureUser.getUserPrincipalName());
             azureUserAttributes.put("identityProviderUserObjectId", azureUser.getId());
-        }
+                    }
         else {
-            log.info("No match for employeeId or studentId {} in azureusercache", employeeIdORStudentId);
+            log.info("No match for employeeId or studentId {} in azureusercache",
+                    employeeIdORStudentId);
         }
         return azureUserAttributes;
     }

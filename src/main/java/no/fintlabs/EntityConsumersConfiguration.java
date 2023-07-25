@@ -152,7 +152,8 @@ public class EntityConsumersConfiguration {
                         log.debug("Saved to cache: " + azureUser.getUserPrincipalName());
                     }
                     else {
-                        log.debug("Not saved, missing employeeId or studentId: " + azureUser.getUserPrincipalName());
+                        log.debug("Not saved, missing employeeId or studentId: {} with azureID : {}",
+                                azureUser.getUserPrincipalName(), azureUser.getId());
                     }
                 }
         );
