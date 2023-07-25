@@ -57,12 +57,12 @@ public class UserPublishingComponent {
         List<User> publishedUsers = userEntityProducerService.publishChangedUsers(validUsers);
 
         log.info("Published {} of {} valid users", publishedUsers.size(), validUsers.size());
-        log.debug("Ids of published users: {}",
-                publishedUsers.stream()
-                        .map(User::getResourceId)
-                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
-                        .toList()
-        );
+//        log.debug("Ids of published users: {}",
+//                publishedUsers.stream()
+//                        .map(User::getResourceId)
+//                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
+//                        .toList()
+//        );
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {

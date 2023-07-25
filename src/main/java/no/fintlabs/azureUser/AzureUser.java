@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class AzureUser {
-    private String userObjectId;
+    private String id;
     private String mail;
     private String userPrincipalName;
     private String employeeId;
