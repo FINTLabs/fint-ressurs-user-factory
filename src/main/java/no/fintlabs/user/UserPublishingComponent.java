@@ -123,13 +123,16 @@ public class UserPublishingComponent {
             String organisasjonsId,
             List<String> additionalArbeidsteder
     ) {
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
+
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
         return User
                 .builder()
-                .resourceId(ResourceLinkUtil.getFirstSelfLink(personalressursResource))
+                .resourceId(resourceId)
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
