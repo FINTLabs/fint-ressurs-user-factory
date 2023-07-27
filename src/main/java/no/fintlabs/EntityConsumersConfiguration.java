@@ -1,5 +1,6 @@
 package no.fintlabs;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
@@ -8,9 +9,12 @@ import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
+import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.kafka.common.ListenerContainerFactory;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
+import no.fintlabs.kafka.entity.topic.EntityTopicNamePatternParameters;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.user.User;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 @Configuration
+@Slf4j
 public class EntityConsumersConfiguration {
 
     private final EntityConsumerFactoryService entityConsumerFactoryService;
@@ -127,6 +132,47 @@ public class EntityConsumersConfiguration {
                 skoleResourceCache
         );
     }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String,AzureUser> azureUserResourceEntityConsumer(
+            FintCache<String, AzureUser> azureUserResourceCache
+    ){
+        ListenerContainerFactory<AzureUser, EntityTopicNameParameters, EntityTopicNamePatternParameters> azureUserConsumerFactory = entityConsumerFactoryService.createFactory(
+                AzureUser.class,
+                consumerRecord -> {
+                    AzureUser azureUser = consumerRecord.value();
+                    log.debug("Trying to save: " + azureUser.getUserPrincipalName());
+                    if (validateAzureUser(azureUser)) {
+                        azureUserResourceCache.put(
+                                azureUser.getEmployeeId() != null
+                                        ? azureUser.getEmployeeId()
+                                        : azureUser.getStudentId(),
+                                azureUser
+                        );
+                        log.debug("Saved to cache: " + azureUser.getUserPrincipalName());
+                    }
+                    else {
+                        log.debug("Not saved, missing employeeId or studentId: {} with azureID : {}",
+                                azureUser.getUserPrincipalName(), azureUser.getId());
+                    }
+                }
+        );
+        if (azureUserConsumerFactory != null){
+           return azureUserConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("azureuser").build());
+        }
+        else { return null; }
+
+    }
+
+    boolean validateAzureUser(AzureUser azureUser){
+        if (azureUser.getEmployeeId() == null && azureUser.getStudentId() == null){
+            return false;
+        }
+        return true;
+    }
+
+
+
 
     @Bean
     ConcurrentMessageListenerContainer<String, User> userEntityConsumer(

@@ -7,6 +7,7 @@ import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
+import no.fintlabs.azureUser.AzureUserService;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.resourceServices.ElevService;
 import no.fintlabs.resourceServices.ElevforholdService;
@@ -15,9 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -25,15 +24,17 @@ public class UserPublishingElevComponent {
     private final ElevService elevService;
     private final PersonUtdanningService personUtdanningService;
     private final ElevforholdService elevforholdService;
+    private final AzureUserService azureUserService;
     private final UserEntityProducerService userEntityProducerService;
 
     public UserPublishingElevComponent(
             ElevService elevService,
             PersonUtdanningService personUtdanningService,
-            ElevforholdService elevforholdService, UserEntityProducerService userEntityProducerService){
+            ElevforholdService elevforholdService, AzureUserService azureUserService, UserEntityProducerService userEntityProducerService){
         this.elevService = elevService;
         this.personUtdanningService = personUtdanningService;
         this.elevforholdService = elevforholdService;
+        this.azureUserService = azureUserService;
         this.userEntityProducerService = userEntityProducerService;
     }
 
@@ -107,17 +108,27 @@ public class UserPublishingElevComponent {
             String organisasjonsnavn,
             String organisasjonsId
     ){
+
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(elevResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") + 1);
+
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
+
+        Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+
         return User.builder()
-                .resourceId(ResourceLinkUtil.getFirstSelfLink(elevResource))
+                .resourceId(resourceId)
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.STUDENT))
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
                 .mobilePhone(mobilePhone)
+                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
+                .email(azureUserAttributes.getOrDefault("email",""))
+                .userName(azureUserAttributes.getOrDefault("userName",""))
                 .build();
     }
 }

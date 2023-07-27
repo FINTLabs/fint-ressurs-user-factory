@@ -6,6 +6,7 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
+import no.fintlabs.azureUser.AzureUserService;
 import no.fintlabs.resourceServices.ArbeidsforholdService;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.resourceServices.PersonService;
@@ -14,10 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -25,6 +23,7 @@ public class UserPublishingComponent {
 
     private final PersonService personService;
     private final PersonalressursService personalressursService;
+    private final AzureUserService azureUserService;
     private final ArbeidsforholdService arbeidsforholdService;
 
     private final UserEntityProducerService userEntityProducerService;
@@ -33,11 +32,13 @@ public class UserPublishingComponent {
             PersonService personService,
             PersonalressursService personalressursService,
             ArbeidsforholdService arbeidsforholdService,
+            AzureUserService azureUserService,
             UserEntityProducerService userEntityProducerService
     ) {
         this.personService = personService;
         this.personalressursService = personalressursService;
         this.arbeidsforholdService = arbeidsforholdService;
+        this.azureUserService = azureUserService;
         this.userEntityProducerService = userEntityProducerService;
     }
 
@@ -57,12 +58,12 @@ public class UserPublishingComponent {
         List<User> publishedUsers = userEntityProducerService.publishChangedUsers(validUsers);
 
         log.info("Published {} of {} valid users", publishedUsers.size(), validUsers.size());
-        log.debug("Ids of published users: {}",
-                publishedUsers.stream()
-                        .map(User::getResourceId)
-                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
-                        .toList()
-        );
+//        log.debug("Ids of published users: {}",
+//                publishedUsers.stream()
+//                        .map(User::getResourceId)
+//                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
+//                        .toList()
+//        );
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
@@ -123,13 +124,18 @@ public class UserPublishingComponent {
             String organisasjonsId,
             List<String> additionalArbeidsteder
     ) {
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
+
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
+        Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+
         return User
                 .builder()
-                .resourceId(ResourceLinkUtil.getFirstSelfLink(personalressursResource))
+                .resourceId(resourceId)
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
                 .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
@@ -138,6 +144,9 @@ public class UserPublishingComponent {
                 .organisationUnitIds(additionalArbeidsteder)
                 .mobilePhone(mobilePhone)
                 .managerRef(lederPersonalressursHref)
+                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
+                .email(azureUserAttributes.getOrDefault("email",""))
+                .userName(azureUserAttributes.getOrDefault("userName",""))
                 .build();
     }
 
