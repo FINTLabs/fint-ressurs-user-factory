@@ -23,4 +23,8 @@ public class ExternalUser {
     private String mainOrganisationUnitId;
     private String mobilePhone;
     private String email;
+
+    public boolean isValid(){
+        return true;
+    }
 }

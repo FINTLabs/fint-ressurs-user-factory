@@ -17,6 +17,7 @@ import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.kafka.entity.topic.EntityTopicNamePatternParameters;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.user.User;
+import no.fintlabs.externalUser.ExternalUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
@@ -164,12 +165,40 @@ public class EntityConsumersConfiguration {
 
     }
 
+
+    @Bean
+    ConcurrentMessageListenerContainer<String,ExternalUser> externalUserResourceEntityConsumer(
+            FintCache<String,ExternalUser> externalUserResourceCache
+    ){
+        ListenerContainerFactory<ExternalUser,EntityTopicNameParameters,EntityTopicNamePatternParameters> externalUserConsumerFactory = entityConsumerFactoryService.createFactory(
+                ExternalUser.class,
+                consumerRecord -> {
+                    ExternalUser externalUser = consumerRecord.value();
+                    log.debug("Trying to save: " + externalUser.getUserName());
+                    if (externalUser.isValid()) {
+                        externalUserResourceCache.put(externalUser.getIdentityProviderUserObjectId().toString(),externalUser);
+                        log.debug("Saved to cache: " + externalUser.getIdentityProviderUserObjectId());
+                    }
+                    else {
+                        log.debug("Failed to save: " + externalUser.getIdentityProviderUserObjectId());
+                    }
+                }
+        );
+        if (externalUserConsumerFactory != null){
+            return externalUserConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("externaluser").build());
+        }
+        else { return null;}
+
+    }
+
 //    boolean validateAzureUser(AzureUser azureUser){
 //        if (azureUser.getEmployeeId() == null && azureUser.getStudentId() == null){
 //            return false;
 //        }
 //        return true;
 //    }
+
+
 
 
 
