@@ -11,6 +11,7 @@ import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
 import no.fintlabs.externalUser.ExternalUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -62,8 +63,14 @@ public class EntityCacheConfiguration {
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}
 
     @Bean
+    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
     FintCache<String, ExternalUser> externalUserResourceCache(){return createCache(ExternalUser.class);}
 
+    @Bean
+    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
+    FintCache<String, Integer> publishedExternalUserHashCache() {
+        return createCache(Integer.class);
+    }
 
     @Bean
     FintCache<String, Integer> publishedUserHashCache() {

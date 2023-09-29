@@ -18,6 +18,7 @@ import no.fintlabs.kafka.entity.topic.EntityTopicNamePatternParameters;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.user.User;
 import no.fintlabs.externalUser.ExternalUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
@@ -167,6 +168,7 @@ public class EntityConsumersConfiguration {
 
 
     @Bean
+    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
     ConcurrentMessageListenerContainer<String,ExternalUser> externalUserResourceEntityConsumer(
             FintCache<String,ExternalUser> externalUserResourceCache
     ){

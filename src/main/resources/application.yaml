@@ -16,6 +16,7 @@ fint:
         initial-delay: 20000
         initial-delay-elev: 25000
         fixed-delay: 20000
+    externalusers: yes
 spring:
   kafka:
     consumer:
