@@ -4,7 +4,8 @@ public class UserUtils {
 
     public enum UserType {
         EMPLOYEE,
-        STUDENT
+        STUDENT,
+        EXTERNAL
     }
 
 }
