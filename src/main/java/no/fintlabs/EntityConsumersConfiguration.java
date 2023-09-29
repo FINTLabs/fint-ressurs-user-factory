@@ -142,7 +142,7 @@ public class EntityConsumersConfiguration {
                 consumerRecord -> {
                     AzureUser azureUser = consumerRecord.value();
                     log.debug("Trying to save: " + azureUser.getUserPrincipalName());
-                    if (validateAzureUser(azureUser)) {
+                    if (azureUser.isValid()) {
                         azureUserResourceCache.put(
                                 azureUser.getEmployeeId() != null
                                         ? azureUser.getEmployeeId()
@@ -164,12 +164,12 @@ public class EntityConsumersConfiguration {
 
     }
 
-    boolean validateAzureUser(AzureUser azureUser){
-        if (azureUser.getEmployeeId() == null && azureUser.getStudentId() == null){
-            return false;
-        }
-        return true;
-    }
+//    boolean validateAzureUser(AzureUser azureUser){
+//        if (azureUser.getEmployeeId() == null && azureUser.getStudentId() == null){
+//            return false;
+//        }
+//        return true;
+//    }
 
 
 

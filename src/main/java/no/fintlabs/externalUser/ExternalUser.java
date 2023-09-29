@@ -1,6 +1,7 @@
 package no.fintlabs.externalUser;
 
 import lombok.*;
+import no.fintlabs.user.UserUtils;
 
 import java.util.UUID;
 
@@ -14,7 +15,8 @@ public class ExternalUser {
     private Long id;
     private String firstName;
     private String lastName;
-    private String userType;
+    @Builder.Default
+    private String userType = String.valueOf(UserUtils.UserType.EXTERNAL);
     private String userName;
     private UUID identityProviderUserObjectId;
     private String mainOrganisationUnitName;
