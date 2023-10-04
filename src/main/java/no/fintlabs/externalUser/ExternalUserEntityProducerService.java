@@ -7,6 +7,7 @@ import no.fintlabs.kafka.entity.EntityProducerFactory;
 import no.fintlabs.kafka.entity.EntityProducerRecord;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.kafka.entity.topic.EntityTopicService;
+import no.fintlabs.user.UserUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,6 +59,7 @@ public class ExternalUserEntityProducerService {
 
     public void publishExternalUsers(ExternalUser externalUser) {
         String key = String.valueOf(externalUser.getIdentityProviderUserObjectId());
+        externalUser.setUserType(String.valueOf(UserUtils.UserType.EXTERNAL));
         entityProducer.send(
                 EntityProducerRecord.<ExternalUser>builder()
                         .topicNameParameters(entityTopicNameParameters)
