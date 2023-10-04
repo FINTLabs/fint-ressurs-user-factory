@@ -11,6 +11,7 @@ import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.externalUser.ExternalUserEntityProducerService;
 import no.fintlabs.kafka.common.ListenerContainerFactory;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
@@ -139,7 +140,8 @@ public class EntityConsumersConfiguration {
     ConcurrentMessageListenerContainer<String,AzureUser> azureUserResourceEntityConsumer(
             FintCache<String, AzureUser> azureUserResourceCache
     ){
-        ListenerContainerFactory<AzureUser, EntityTopicNameParameters, EntityTopicNamePatternParameters> azureUserConsumerFactory = entityConsumerFactoryService.createFactory(
+        ListenerContainerFactory<AzureUser, EntityTopicNameParameters, EntityTopicNamePatternParameters> azureUserConsumerFactory
+                = entityConsumerFactoryService.createFactory(
                 AzureUser.class,
                 consumerRecord -> {
                     AzureUser azureUser = consumerRecord.value();
@@ -167,42 +169,32 @@ public class EntityConsumersConfiguration {
     }
 
 
-    @Bean
-    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
-    ConcurrentMessageListenerContainer<String,ExternalUser> externalUserResourceEntityConsumer(
-            FintCache<String,ExternalUser> externalUserResourceCache
-    ){
-        ListenerContainerFactory<ExternalUser,EntityTopicNameParameters,EntityTopicNamePatternParameters> externalUserConsumerFactory = entityConsumerFactoryService.createFactory(
-                ExternalUser.class,
-                consumerRecord -> {
-                    ExternalUser externalUser = consumerRecord.value();
-                    log.debug("Trying to save: " + externalUser.getUserName());
-                    if (externalUser.isValid()) {
-                        externalUserResourceCache.put(externalUser.getIdentityProviderUserObjectId().toString(),externalUser);
-                        log.debug("Saved to cache: " + externalUser.getIdentityProviderUserObjectId());
-                    }
-                    else {
-                        log.debug("Failed to save: " + externalUser.getIdentityProviderUserObjectId());
-                    }
-                }
-        );
-        if (externalUserConsumerFactory != null){
-            return externalUserConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("externaluser").build());
-        }
-        else { return null;}
 
-    }
-
-//    boolean validateAzureUser(AzureUser azureUser){
-//        if (azureUser.getEmployeeId() == null && azureUser.getStudentId() == null){
-//            return false;
+//    @Bean
+//    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
+//    ConcurrentMessageListenerContainer<String,ExternalUser> externalUserResourceEntityConsumer(
+//            FintCache<String,ExternalUser> externalUserResourceCache
+//    ){
+//        ListenerContainerFactory<ExternalUser,EntityTopicNameParameters,EntityTopicNamePatternParameters> externalUserConsumerFactory = entityConsumerFactoryService.createFactory(
+//                ExternalUser.class,
+//                consumerRecord -> {
+//                    ExternalUser externalUser = consumerRecord.value();
+//                    log.debug("Trying to save: " + externalUser.getUserName());
+//                    if (externalUser.isValid()) {
+//                        externalUserResourceCache.put(externalUser.getIdentityProviderUserObjectId().toString(),externalUser);
+//                        log.debug("Saved to cache: " + externalUser.getIdentityProviderUserObjectId());
+//                    }
+//                    else {
+//                        log.debug("Failed to save: " + externalUser.getIdentityProviderUserObjectId());
+//                    }
+//                }
+//        );
+//        if (externalUserConsumerFactory != null){
+//            return externalUserConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("externaluser").build());
 //        }
-//        return true;
+//        else { return null;}
+//
 //    }
-
-
-
-
 
 
     @Bean

@@ -58,12 +58,6 @@ public class UserPublishingComponent {
         List<User> publishedUsers = userEntityProducerService.publishChangedUsers(validUsers);
 
         log.info("Published {} of {} valid users", publishedUsers.size(), validUsers.size());
-//        log.debug("Ids of published users: {}",
-//                publishedUsers.stream()
-//                        .map(User::getResourceId)
-//                        .map(href -> href.substring(href.lastIndexOf("/") + 1))
-//                        .toList()
-//        );
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
@@ -81,9 +75,6 @@ public class UserPublishingComponent {
 
         Optional<OrganisasjonselementResource> arbeidsstedOptional = arbeidsforholdOptional
                 .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
-//        if (arbeidsstedOptional.isEmpty()) {
-//            return Optional.empty();
-//        }
 
         List<String> additionalArbeidssteder = new ArrayList<>();
         if (arbeidsstedOptional.isPresent()) {
@@ -100,9 +91,6 @@ public class UserPublishingComponent {
 
         Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
-//        if (lederPersonalressursLinkOptional.isEmpty()) {
-//            return Optional.empty();
-//        }
 
         return Optional.of(
                 createUser(

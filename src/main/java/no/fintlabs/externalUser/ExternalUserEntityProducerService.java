@@ -56,4 +56,14 @@ public class ExternalUserEntityProducerService {
 
     }
 
+    public void publishExternalUsers(ExternalUser externalUser) {
+        String key = String.valueOf(externalUser.getIdentityProviderUserObjectId());
+        entityProducer.send(
+                EntityProducerRecord.<ExternalUser>builder()
+                        .topicNameParameters(entityTopicNameParameters)
+                        .key(key)
+                        .value(externalUser)
+                        .build()
+        );
+    }
 }

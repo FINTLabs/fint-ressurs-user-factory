@@ -62,15 +62,15 @@ public class EntityCacheConfiguration {
     @Bean
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}
 
-    @Bean
-    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
-    FintCache<String, ExternalUser> externalUserResourceCache(){return createCache(ExternalUser.class);}
-
-    @Bean
-    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
-    FintCache<String, Integer> publishedExternalUserHashCache() {
-        return createCache(Integer.class);
-    }
+//    @Bean
+//    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
+//    FintCache<String, ExternalUser> externalUserResourceCache(){return createCache(ExternalUser.class);}
+//
+//    @Bean
+//    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
+//    FintCache<String, Integer> publishedExternalUserHashCache() {
+//        return createCache(Integer.class);
+//    }
 
     @Bean
     FintCache<String, Integer> publishedUserHashCache() {
