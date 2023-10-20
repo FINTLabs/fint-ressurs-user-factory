@@ -8,6 +8,7 @@ import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
+import no.fintlabs.externalUser.AzureExternalUser;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
 import no.fintlabs.externalUser.ExternalUser;
@@ -62,15 +63,10 @@ public class EntityCacheConfiguration {
     @Bean
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}
 
-//    @Bean
-//    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
-//    FintCache<String, ExternalUser> externalUserResourceCache(){return createCache(ExternalUser.class);}
-//
-//    @Bean
-//    @ConditionalOnProperty(name = "fint.kontroll.externalusers", havingValue = "yes")
-//    FintCache<String, Integer> publishedExternalUserHashCache() {
-//        return createCache(Integer.class);
-//    }
+    @Bean
+    FintCache<String, AzureExternalUser> externalAzureUserResourceCache(){return createCache(AzureExternalUser.class);}
+
+
 
     @Bean
     FintCache<String, Integer> publishedUserHashCache() {

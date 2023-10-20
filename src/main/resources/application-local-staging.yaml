@@ -25,4 +25,4 @@ server:
 logging:
   level:
     #no.fintlabs.user.UserPublishingComponent: DEBUG
-    no.fintlabs: DEBUG
+    no.fintlabs: INFO
