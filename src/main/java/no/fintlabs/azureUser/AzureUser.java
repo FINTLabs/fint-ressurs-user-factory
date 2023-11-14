@@ -16,10 +16,7 @@ public class AzureUser {
     private String studentId;
 
     public boolean isValid(){
-        if (this.getEmployeeId() == null && this.getStudentId() == null){
-            return false;
-        }
-        return true;
+        return this.getEmployeeId() != null || this.getStudentId() != null;
     }
 
 

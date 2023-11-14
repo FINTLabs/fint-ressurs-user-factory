@@ -8,11 +8,8 @@ import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
-import no.fintlabs.externalUser.AzureExternalUser;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
-import no.fintlabs.externalUser.ExternalUser;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -62,10 +59,6 @@ public class EntityCacheConfiguration {
 
     @Bean
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}
-
-    @Bean
-    FintCache<String, AzureExternalUser> externalAzureUserResourceCache(){return createCache(AzureExternalUser.class);}
-
 
 
     @Bean

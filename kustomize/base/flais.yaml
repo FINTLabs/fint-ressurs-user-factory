@@ -8,12 +8,12 @@ spec:
   image: ghcr.io/fintlabs/fint-kontroll-user-factory:latest
   imagePullPolicy: Always
   env:
-    - name: fint.client.base-url
-      value: 'http://fint-kontroll-mock-service:3000'
-    - name: fint.kontroll.datainput
-      value: 'mock'
-    - name: fint.resource-gateway.authorization
-      value: 'disabled'
+    - name: fint.kontroll.user.publishing.initial-delay
+      value: '20000'
+    - name: fint.kontroll.user.publishing.initial-delay-elev
+      value: '25000'
+    - name: fint.kontroll.user.publishing.fixed-delay
+      value: '20000'
   kafka:
     enabled: true
     acls:

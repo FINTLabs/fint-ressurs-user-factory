@@ -48,7 +48,7 @@ public class UserPublishingComponent {
     )
     public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-                List<User> validUsers = personalressursService.getAllValid(currentTime)
+        List<User> validUsers = personalressursService.getAllValid(currentTime)
                 .stream()
                 .map(personalressursResource -> createUser(personalressursResource, currentTime))
                 .filter(Optional::isPresent)

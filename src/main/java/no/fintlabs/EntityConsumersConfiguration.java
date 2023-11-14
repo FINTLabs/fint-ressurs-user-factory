@@ -10,16 +10,13 @@ import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
-import no.fintlabs.externalUser.AzureExternalUser;
 import no.fintlabs.cache.FintCache;
-import no.fintlabs.externalUser.AzureExternalUser;
 import no.fintlabs.kafka.common.ListenerContainerFactory;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.kafka.entity.topic.EntityTopicNamePatternParameters;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.user.User;
-import no.fintlabs.externalUser.ExternalUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
@@ -168,32 +165,6 @@ public class EntityConsumersConfiguration {
 
     }
 
-
-
-    @Bean
-    ConcurrentMessageListenerContainer<String,AzureExternalUser> externalAzureUserResourceEntityConsumer(
-            FintCache<String,AzureExternalUser> azureExternalUserCache
-    ){
-        ListenerContainerFactory<AzureExternalUser,EntityTopicNameParameters,EntityTopicNamePatternParameters> externalUserConsumerFactory = entityConsumerFactoryService.createFactory(
-                AzureExternalUser.class,
-                consumerRecord -> {
-                    AzureExternalUser externalAzureUser = consumerRecord.value();
-                    log.debug("Trying to save: " + externalAzureUser.getUserName());
-                    if (externalAzureUser.isValid()) {
-                        azureExternalUserCache.put(externalAzureUser.getIdpUserObjectId().toString(),externalAzureUser);
-                        log.debug("Saved to cache: " + externalAzureUser.getIdpUserObjectId());
-                    }
-                    else {
-                        log.debug("Failed to save: " + externalAzureUser.getIdpUserObjectId());
-                    }
-                }
-        );
-        if (externalUserConsumerFactory != null){
-            return externalUserConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("azureuserexternal").build());
-        }
-        else { return null;}
-
-    }
 
 
     @Bean

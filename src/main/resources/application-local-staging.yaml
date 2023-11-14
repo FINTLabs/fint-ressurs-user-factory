@@ -11,7 +11,6 @@ fint:
       org-id: ${fint.org-id}
       domain-context: kontroll
   kontroll:
-    externalusers: yes
 spring:
   security:
     oauth2:
