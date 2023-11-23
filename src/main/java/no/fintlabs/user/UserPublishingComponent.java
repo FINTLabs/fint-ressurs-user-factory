@@ -92,7 +92,7 @@ public class UserPublishingComponent {
             if (!additionalOrgUnits.isEmpty()){
                 additionalArbeidssteder = additionalOrgUnits
                         .stream()
-                        .peek(organisasjonselementResource -> System.out.println("orgElement: "+ organisasjonselementResource))
+                        .filter(Optional::isPresent)
                         .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
                         .toList();
             }
