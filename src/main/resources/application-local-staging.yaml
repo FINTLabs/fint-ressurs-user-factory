@@ -1,5 +1,6 @@
 fint:
   org-id: fintlabs.no
+  application-id: 'fint-kontroll-user-factory'
   client:
     base-url: https://beta.felleskomponent.no
   kafka:

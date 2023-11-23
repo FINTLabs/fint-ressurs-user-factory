@@ -90,6 +90,7 @@ public class ArbeidsforholdService {
     }
     public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
         return ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
+                .map(ResourceLinkUtil::systemIdToLowerCase)
                 .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
                         gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime));
