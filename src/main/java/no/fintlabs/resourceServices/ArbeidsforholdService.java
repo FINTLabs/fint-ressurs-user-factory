@@ -1,5 +1,6 @@
 package no.fintlabs.resourceServices;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ArbeidsforholdService {
 
     private final GyldighetsperiodeService gyldighetsperiodeService;
@@ -89,11 +91,14 @@ public class ArbeidsforholdService {
                 .toList();
     }
     public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
-        return ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
-                .map(ResourceLinkUtil::systemIdToLowerCase)
+        Optional<OrganisasjonselementResource> organisasjonselementResoureOptional = ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
+                .map(ResourceLinkUtil::organisasjonsIdToLowerCase)
                 .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
                         gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime));
+
+
+        return organisasjonselementResoureOptional;
     }
 
 

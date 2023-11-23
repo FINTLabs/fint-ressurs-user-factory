@@ -2,6 +2,7 @@ package no.fintlabs.links;
 
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,5 +50,7 @@ public class ResourceLinkUtil {
     public static String systemIdToLowerCase(String path) {
         return path.replace("systemId", "systemid");
     }
+
+    public static String organisasjonsIdToLowerCase(String path) {return path.replace("organisasjonsId", "organisasjonsid");}
 
 }
