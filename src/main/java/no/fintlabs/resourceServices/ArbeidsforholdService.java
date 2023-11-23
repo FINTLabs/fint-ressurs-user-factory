@@ -85,10 +85,12 @@ public class ArbeidsforholdService {
 
     public List<Optional<OrganisasjonselementResource>> getAllArbeidssteder(List<ArbeidsforholdResource> arbeidsforholdResourceList,
                                                                             Date currentTime){
-        return arbeidsforholdResourceList
+        List<Optional<OrganisasjonselementResource>> organisasjonsElementResourceList = arbeidsforholdResourceList
                 .stream()
-                .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource,currentTime))
+                .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource, currentTime))
                 .toList();
+
+        return organisasjonsElementResourceList;
     }
     public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
         Optional<OrganisasjonselementResource> organisasjonselementResoureOptional = ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)

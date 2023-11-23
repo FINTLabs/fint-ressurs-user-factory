@@ -25,7 +25,6 @@ public class UserPublishingComponent {
     private final PersonalressursService personalressursService;
     private final AzureUserService azureUserService;
     private final ArbeidsforholdService arbeidsforholdService;
-
     private final UserEntityProducerService userEntityProducerService;
 
     public UserPublishingComponent(
@@ -77,29 +76,42 @@ public class UserPublishingComponent {
                 .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
 
         List<String> additionalArbeidssteder = new ArrayList<>();
+
         if (arbeidsstedOptional.isPresent()) {
             List<ArbeidsforholdResource> additionalArbeidsforhold =
                     arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
                             currentTime);
             List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
                     arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
-            additionalArbeidssteder = additionalOrgUnits
-                    .stream()
-                    .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
-                    .toList();
+            if (!additionalOrgUnits.isEmpty()){
+                additionalArbeidssteder = additionalOrgUnits
+                        .stream()
+                        .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
+                        .toList();
+            }
+
         }
 
         Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
 
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
+        Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        if (azureUserAttributes.isEmpty()){
+            return Optional.empty();
+        }
+
         return Optional.of(
                 createUser(
                         personalressursResource,
                         personResourceOptional.get(),
-                        lederPersonalressursLinkOptional.isEmpty()? "": lederPersonalressursLinkOptional.get(),
+                        lederPersonalressursLinkOptional.orElse(""),
                         arbeidsstedOptional.isPresent()? arbeidsstedOptional.get().getOrganisasjonsnavn():"",
                         arbeidsstedOptional.isPresent()?arbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"",
-                        additionalArbeidssteder
+                        additionalArbeidssteder,
+                        azureUserAttributes.get(),
+                        resourceId
                 )
         );
     }
@@ -110,16 +122,18 @@ public class UserPublishingComponent {
             String lederPersonalressursHref,
             String organisasjonsnavn,
             String organisasjonsId,
-            List<String> additionalArbeidsteder
+            List<String> additionalArbeidsteder,
+            Map<String,String> azureUserAttributes,
+            String resourceId
     ) {
-        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
-        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
+//        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
+//        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+       // Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
 
         return User
                 .builder()

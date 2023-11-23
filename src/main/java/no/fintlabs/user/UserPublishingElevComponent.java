@@ -89,6 +89,14 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
+        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(elevResource);
+        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") + 1);
+        Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        if (azureUserAttributes.isEmpty()){
+            return Optional.empty();
+        }
+
+
         return Optional.of(
                 createUser(
                         elevResource,
@@ -96,7 +104,9 @@ public class UserPublishingElevComponent {
                         skoleOrgUnitOptional.isPresent()?
                                 skoleOrgUnitOptional.get().getOrganisasjonsnavn():"",
                         skoleOrgUnitOptional.isPresent()?
-                                skoleOrgUnitOptional.get().getOrganisasjonsId().getIdentifikatorverdi():""
+                                skoleOrgUnitOptional.get().getOrganisasjonsId().getIdentifikatorverdi():"",
+                        azureUserAttributes.get(),
+                        resourceId
                 )
 
         );
@@ -106,17 +116,17 @@ public class UserPublishingElevComponent {
             ElevResource elevResource,
             PersonResource personResource,
             String organisasjonsnavn,
-            String organisasjonsId
+            String organisasjonsId,
+            Map<String,String> azureUserAttributes,
+            String resourceId
     ){
 
-        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(elevResource);
-        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") + 1);
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        //Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
 
         return User.builder()
                 .resourceId(resourceId)
