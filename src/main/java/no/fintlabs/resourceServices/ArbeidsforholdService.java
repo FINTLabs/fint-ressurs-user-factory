@@ -28,7 +28,7 @@ public class ArbeidsforholdService {
         this.organisasjonselementResourceCache = organisasjonselementResourceCache;
     }
 
-    public Optional<ArbeidsforholdResource> getArbeidsforhold(
+    public Optional<ArbeidsforholdResource> getHovedArbeidsforhold(
             Collection<Link> arbeidsforholdLinks,
             Date currentTime
     ) {
@@ -89,6 +89,8 @@ public class ArbeidsforholdService {
                 .stream()
                 .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource, currentTime))
                 .toList();
+
+        log.info("Antall additional orgresourses:" + organisasjonsElementResourceList.size());
 
         return organisasjonsElementResourceList;
     }

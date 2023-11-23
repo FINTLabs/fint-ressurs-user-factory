@@ -66,33 +66,40 @@ public class UserPublishingComponent {
             return Optional.empty();
         }
 
+        //Hovedstilling
         Optional<ArbeidsforholdResource> arbeidsforholdOptional =
-                arbeidsforholdService.getArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
+                arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
         if (arbeidsforholdOptional.isEmpty()) {
             return Optional.empty();
         }
-
-        Optional<OrganisasjonselementResource> arbeidsstedOptional = arbeidsforholdOptional
+        Optional<OrganisasjonselementResource> hovedArbeidsstedOptional = arbeidsforholdOptional
                 .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
 
+
+
+        //Additional orgunits
         List<String> additionalArbeidssteder = new ArrayList<>();
 
-        if (arbeidsstedOptional.isPresent()) {
             List<ArbeidsforholdResource> additionalArbeidsforhold =
                     arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
                             currentTime);
+            log.info("antall arbeidsforhold: " +additionalArbeidsforhold.size());
+
             List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
                     arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
+            log.info("antall arbeidssteder:" + additionalOrgUnits);
+
             if (!additionalOrgUnits.isEmpty()){
                 additionalArbeidssteder = additionalOrgUnits
                         .stream()
+                        .peek(organisasjonselementResource -> System.out.println("orgElement: "+ organisasjonselementResource))
                         .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
                         .toList();
             }
 
-        }
 
-        Optional<String> lederPersonalressursLinkOptional = arbeidsstedOptional
+
+        Optional<String> lederPersonalressursLinkOptional = hovedArbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
 
         String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
@@ -107,8 +114,8 @@ public class UserPublishingComponent {
                         personalressursResource,
                         personResourceOptional.get(),
                         lederPersonalressursLinkOptional.orElse(""),
-                        arbeidsstedOptional.isPresent()? arbeidsstedOptional.get().getOrganisasjonsnavn():"",
-                        arbeidsstedOptional.isPresent()?arbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"",
+                        hovedArbeidsstedOptional.isPresent()? hovedArbeidsstedOptional.get().getOrganisasjonsnavn():"",
+                        hovedArbeidsstedOptional.isPresent()? hovedArbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"",
                         additionalArbeidssteder,
                         azureUserAttributes.get(),
                         resourceId
