@@ -14,6 +14,8 @@ spec:
       value: '25000'
     - name: fint.kontroll.user.publishing.fixed-delay
       value: '20000'
+    - name: spring.kafka.consumer.group-id
+      value: 'fint-kontroll-user-factory'
   kafka:
     enabled: true
     acls:

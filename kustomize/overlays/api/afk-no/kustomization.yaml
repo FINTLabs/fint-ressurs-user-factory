@@ -22,6 +22,9 @@ patches:
       - op: replace
         path: "/spec/kafka/acls/1/topic"
         value: "afk-no.kontroll.*"
+      - op: replace
+        path: "/spec/env/3/value"
+        value: "afk-no-fint-kontroll-user-factory"
     target:
       kind: Application
       name: fint-kontroll-user-factory
