@@ -24,6 +24,25 @@ class GyldighetsPeriodeServiceTest {
                 .atStartOfDay(ZoneId.of("Z")).toInstant());
     }
 
+
+    @Test
+    public void shouldReturnCorrectDateWhenDaysBeforeStartAreSet(){
+        Date initialDate = Date.from(LocalDate.of(2024, 1, 1)
+                .atStartOfDay(ZoneId.of("Z")).toInstant());
+        System.out.println("Initial start date : " + initialDate);
+        Date resheduledDate = gyldighetsperiodeService.getStartDate(initialDate,30);
+        System.out.println("Rescheduled start date: " + resheduledDate);
+
+        Date dateToCheck = Date.from(LocalDate.of(2023,12,2)
+                .atStartOfDay(ZoneId.of("Z")).toInstant());
+
+        System.out.println("Date for check : " + dateToCheck);
+
+        boolean valid = resheduledDate.equals(dateToCheck);
+
+        assertTrue(valid);
+    }
+
     @Test
     public void shouldReturnTrueGyldighetsperiodeNotNullCurrentTimeBetweenStartAndSluttDate(){
         Date startDate = Date.from((LocalDate.of(2020,8,1)

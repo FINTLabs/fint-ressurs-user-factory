@@ -11,6 +11,7 @@ fint:
     application-id: ${fint.application-id}
     default-replicas: 1
   kontroll:
+    days-before-start: 0
     user:
       publishing:
         initial-delay: 20000

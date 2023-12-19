@@ -12,6 +12,7 @@ fint:
       org-id: ${fint.org-id}
       domain-context: kontroll
   kontroll:
+    days-before-start: 30
 spring:
   security:
     oauth2:
