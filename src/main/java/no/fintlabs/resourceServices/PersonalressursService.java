@@ -35,4 +35,11 @@ public class PersonalressursService {
                 .filter(personalressursResource -> !personalressursResource.getArbeidsforhold().isEmpty())
                 .toList();
     }
+
+    public List<PersonalressursResource> getAllUsersfromCache(){
+        return personalressursResourceCache.getAllDistinct()
+                .stream()
+                .filter(personalressursResource -> !personalressursResource.getArbeidsforhold().isEmpty())
+                .toList();
+    }
 }

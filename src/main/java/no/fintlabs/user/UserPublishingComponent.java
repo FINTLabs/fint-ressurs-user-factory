@@ -47,16 +47,16 @@ public class UserPublishingComponent {
     )
     public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-        List<User> validUsers = personalressursService.getAllValid(currentTime)
+        List<User> allUsersInCache = personalressursService.getAllUsersfromCache()
                 .stream()
                 .map(personalressursResource -> createUser(personalressursResource, currentTime))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(validUsers);
+        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allUsersInCache);
 
-        log.info("Published {} of {} valid users", publishedUsers.size(), validUsers.size());
+        log.info("Published {} of {} users in cache", publishedUsers.size(), allUsersInCache.size());
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
@@ -109,6 +109,8 @@ public class UserPublishingComponent {
             return Optional.empty();
         }
 
+        String status = UserUtils.getUserStatus(personalressursResource,currentTime );
+
         return Optional.of(
                 createUser(
                         personalressursResource,
@@ -118,7 +120,9 @@ public class UserPublishingComponent {
                         hovedArbeidsstedOptional.isPresent()? hovedArbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"",
                         additionalArbeidssteder,
                         azureUserAttributes.get(),
-                        resourceId
+                        resourceId,
+                        status,
+                        currentTime
                 )
         );
     }
@@ -131,10 +135,14 @@ public class UserPublishingComponent {
             String organisasjonsId,
             List<String> additionalArbeidsteder,
             Map<String,String> azureUserAttributes,
-            String resourceId
+            String resourceId,
+            String status,
+            Date currentDate
     ) {
 //        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
 //        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
+
+
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
@@ -156,6 +164,8 @@ public class UserPublishingComponent {
                 .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
                 .email(azureUserAttributes.getOrDefault("email",""))
                 .userName(azureUserAttributes.getOrDefault("userName",""))
+                .status(status)
+                .statusChanged(currentDate)
                 .build();
     }
 
