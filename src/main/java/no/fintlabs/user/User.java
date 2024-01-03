@@ -2,6 +2,7 @@ package no.fintlabs.user;
 
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,5 +27,7 @@ public class User {
     private String mobilePhone;
     private String email;
     private  String managerRef;
+    private String status;
+    private Date statusChanged;
 
 }
