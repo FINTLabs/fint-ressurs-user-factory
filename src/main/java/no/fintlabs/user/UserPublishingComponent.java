@@ -110,6 +110,9 @@ public class UserPublishingComponent {
         }
 
         String status = UserUtils.getUserStatus(personalressursResource,currentTime );
+        Date statusChanged = status.equals("ACTIV")
+                ?personalressursResource.getAnsettelsesperiode().getStart()
+                :personalressursResource.getAnsettelsesperiode().getSlutt();
 
         return Optional.of(
                 createUser(
@@ -122,7 +125,7 @@ public class UserPublishingComponent {
                         azureUserAttributes.get(),
                         resourceId,
                         status,
-                        currentTime
+                        statusChanged
                 )
         );
     }
@@ -137,18 +140,13 @@ public class UserPublishingComponent {
             Map<String,String> azureUserAttributes,
             String resourceId,
             String status,
-            Date currentDate
+            Date statusChanged
     ) {
-//        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
-//        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
-
-
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-       // Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
 
         return User
                 .builder()
@@ -165,7 +163,7 @@ public class UserPublishingComponent {
                 .email(azureUserAttributes.getOrDefault("email",""))
                 .userName(azureUserAttributes.getOrDefault("userName",""))
                 .status(status)
-                .statusChanged(currentDate)
+                .statusChanged(statusChanged)
                 .build();
     }
 
