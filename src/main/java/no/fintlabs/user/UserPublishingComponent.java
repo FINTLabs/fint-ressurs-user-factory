@@ -83,11 +83,11 @@ public class UserPublishingComponent {
             List<ArbeidsforholdResource> additionalArbeidsforhold =
                     arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
                             currentTime);
-            log.info("antall arbeidsforhold: " +additionalArbeidsforhold.size());
+            //log.info("antall arbeidsforhold: " +additionalArbeidsforhold.size());
 
             List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
                     arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
-            log.info("antall arbeidssteder:" + additionalOrgUnits);
+            //log.info("antall arbeidssteder:" + additionalOrgUnits);
 
             if (!additionalOrgUnits.isEmpty()){
                 additionalArbeidssteder = additionalOrgUnits
@@ -102,6 +102,7 @@ public class UserPublishingComponent {
         Optional<String> lederPersonalressursLinkOptional = hovedArbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
 
+        //Azure attributes
         String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
         String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
         Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
@@ -109,10 +110,11 @@ public class UserPublishingComponent {
             return Optional.empty();
         }
 
-        String status = UserUtils.getUserStatus(personalressursResource,currentTime );
-        Date statusChanged = status.equals("ACTIV")
+        String fintStatus = UserUtils.getUserStatus(personalressursResource,currentTime );
+        Date statusChanged = fintStatus.equals("ACTIV")
                 ?personalressursResource.getAnsettelsesperiode().getStart()
                 :personalressursResource.getAnsettelsesperiode().getSlutt();
+
 
         return Optional.of(
                 createUser(
@@ -124,7 +126,7 @@ public class UserPublishingComponent {
                         additionalArbeidssteder,
                         azureUserAttributes.get(),
                         resourceId,
-                        status,
+                        fintStatus,
                         statusChanged
                 )
         );
@@ -139,13 +141,16 @@ public class UserPublishingComponent {
             List<String> additionalArbeidsteder,
             Map<String,String> azureUserAttributes,
             String resourceId,
-            String status,
+            String fintStatus,
             Date statusChanged
     ) {
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
+
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIV")
+                && fintStatus.equals("ACTIV")?"ACTIV":"DISABLED";
 
 
         return User
@@ -162,7 +167,7 @@ public class UserPublishingComponent {
                 .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
                 .email(azureUserAttributes.getOrDefault("email",""))
                 .userName(azureUserAttributes.getOrDefault("userName",""))
-                .status(status)
+                .status(userStatus)
                 .statusChanged(statusChanged)
                 .build();
     }

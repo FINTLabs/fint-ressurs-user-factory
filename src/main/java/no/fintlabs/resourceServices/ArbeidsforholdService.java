@@ -90,7 +90,7 @@ public class ArbeidsforholdService {
                 .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource, currentTime))
                 .toList();
 
-        log.info("Antall additional orgresourses:" + organisasjonsElementResourceList.size());
+        //log.info("Antall additional orgresourses:" + organisasjonsElementResourceList.size());
 
         return organisasjonsElementResourceList;
     }
