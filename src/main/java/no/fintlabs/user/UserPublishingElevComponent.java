@@ -71,6 +71,7 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
+
         Optional<ElevforholdResource> elevforholdOptional =
                 elevforholdService.getElevforhold(elevResource.getElevforhold(),currentTime);
         if (elevforholdOptional.isEmpty()) {
@@ -89,6 +90,7 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
+        //Azure attributes
         String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(elevResource);
         String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") + 1);
         Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
@@ -96,17 +98,22 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
+        String fintStatus = UserUtils.getUserElevStatus(elevforholdOptional.get(),currentTime);
+        Date statusChanged = fintStatus.equals("ACTIV")
+                ?elevforholdOptional.get().getGyldighetsperiode().getStart()
+                :elevforholdOptional.get().getGyldighetsperiode().getSlutt();
+
 
         return Optional.of(
                 createUser(
                         elevResource,
                         personResourceOptional.get(),
-                        skoleOrgUnitOptional.isPresent()?
-                                skoleOrgUnitOptional.get().getOrganisasjonsnavn():"",
-                        skoleOrgUnitOptional.isPresent()?
-                                skoleOrgUnitOptional.get().getOrganisasjonsId().getIdentifikatorverdi():"",
+                        skoleOrgUnitOptional.get().getOrganisasjonsnavn(),
+                        skoleOrgUnitOptional.get().getOrganisasjonsId().getIdentifikatorverdi(),
                         azureUserAttributes.get(),
-                        resourceId
+                        resourceId,
+                        fintStatus,
+                        statusChanged
                 )
 
         );
@@ -118,7 +125,9 @@ public class UserPublishingElevComponent {
             String organisasjonsnavn,
             String organisasjonsId,
             Map<String,String> azureUserAttributes,
-            String resourceId
+            String resourceId,
+            String fintStatus,
+            Date statusChanged
     ){
 
 
@@ -126,7 +135,9 @@ public class UserPublishingElevComponent {
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        //Map<String,String> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIV")
+                && fintStatus.equals("ACTIV")?"ACTIV":"DISABLED";
+
 
         return User.builder()
                 .resourceId(resourceId)
@@ -139,6 +150,8 @@ public class UserPublishingElevComponent {
                 .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
                 .email(azureUserAttributes.getOrDefault("email",""))
                 .userName(azureUserAttributes.getOrDefault("userName",""))
+                .status(userStatus)
+                .statusChanged(statusChanged)
                 .build();
     }
 }

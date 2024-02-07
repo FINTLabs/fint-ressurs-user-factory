@@ -83,11 +83,9 @@ public class UserPublishingComponent {
             List<ArbeidsforholdResource> additionalArbeidsforhold =
                     arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
                             currentTime);
-            //log.info("antall arbeidsforhold: " +additionalArbeidsforhold.size());
 
             List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
                     arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
-            //log.info("antall arbeidssteder:" + additionalOrgUnits);
 
             if (!additionalOrgUnits.isEmpty()){
                 additionalArbeidssteder = additionalOrgUnits
@@ -96,7 +94,6 @@ public class UserPublishingComponent {
                         .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
                         .toList();
             }
-
 
 
         Optional<String> lederPersonalressursLinkOptional = hovedArbeidsstedOptional

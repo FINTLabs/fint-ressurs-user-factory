@@ -55,7 +55,7 @@ public class ElevforholdService {
     ){
         return elevforholdResources
                 .stream()
-                .filter(elevforholdResource -> isValid(elevforholdResource,currentTime))
+                //.filter(elevforholdResource -> isValid(elevforholdResource,currentTime))
                 .filter(this::isHovedSkole)
                 .findFirst();
     }
