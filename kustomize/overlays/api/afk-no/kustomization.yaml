@@ -17,15 +17,14 @@ patches:
         path: "/spec/orgId"
         value: "afk.no"
       - op: add
-        path: "/spec/containers"
+        path: "/spec/resources"
         value: 
-          resources:
-            limits:
-              cpu: "1"
-              memory: "1Gi"
-            requests:
-              cpu: "0.5"
-              memory: "500Mib"
+          limits:
+            cpu: "1000m"
+            memory: "1000Mi"
+          requests:
+            cpu: "500m"
+            memory: "500Mi"
       - op: replace
         path: "/spec/kafka/acls/0/topic"
         value: "afk-no.kontroll.*"
