@@ -6,6 +6,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
@@ -56,6 +57,9 @@ public class EntityCacheConfiguration {
 
     @Bean
     FintCache<String, SkoleResource> skoleResourceCache() {return createCache(SkoleResource.class);}
+
+    @Bean
+    FintCache<String, SkoleressursResource> skoleressursResourceCache() {return createCache(SkoleressursResource.class);}
 
     @Bean
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}

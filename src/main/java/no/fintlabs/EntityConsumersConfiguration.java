@@ -134,6 +134,7 @@ public class EntityConsumersConfiguration {
         );
     }
 
+    @Bean
     ConcurrentMessageListenerContainer<String, SkoleressursResource> SkoleressursResourceEntityConsumer(
             FintCache<String,SkoleressursResource> skoleressursResourceCache
     ){
