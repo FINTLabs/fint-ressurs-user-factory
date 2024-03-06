@@ -8,6 +8,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
@@ -130,6 +131,16 @@ public class EntityConsumersConfiguration {
                 "utdanning.utdanningsprogram.skole",
                 SkoleResource.class,
                 skoleResourceCache
+        );
+    }
+
+    ConcurrentMessageListenerContainer<String, SkoleressursResource> SkoleressursResourceEntityConsumer(
+            FintCache<String,SkoleressursResource> skoleressursResourceCache
+    ){
+        return createCacheConsumer(
+                "utdanning.elev.skoleressurs",
+                SkoleressursResource.class,
+                skoleressursResourceCache
         );
     }
 
