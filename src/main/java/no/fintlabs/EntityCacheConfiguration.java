@@ -64,6 +64,9 @@ public class EntityCacheConfiguration {
     @Bean
     FintCache<String, AzureUser> azureUserResourceCache(){return createCache(AzureUser.class);}
 
+    @Bean
+    FintCache<String, Long> employeeInSchoolCache() {return createCache(Long.class);}
+
 
     @Bean
     FintCache<String, Integer> publishedUserHashCache() {

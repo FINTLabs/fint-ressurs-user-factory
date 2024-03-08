@@ -134,15 +134,44 @@ public class EntityConsumersConfiguration {
         );
     }
 
+//    @Bean
+//    ConcurrentMessageListenerContainer<String, SkoleressursResource> SkoleressursResourceEntityConsumer(
+//            FintCache<String,SkoleressursResource> skoleressursResourceCache
+//    ){
+//        return createCacheConsumer(
+//                "utdanning.elev.skoleressurs",
+//                SkoleressursResource.class,
+//                skoleressursResourceCache
+//        );
+//    }
+
     @Bean
-    ConcurrentMessageListenerContainer<String, SkoleressursResource> SkoleressursResourceEntityConsumer(
-            FintCache<String,SkoleressursResource> skoleressursResourceCache
+    ConcurrentMessageListenerContainer<String, SkoleressursResource> skoleressursResourceEntityConsumer(
+            FintCache<String, SkoleressursResource> skoleressursResourceCache,
+            FintCache<String,Long> employeeInSchoolCache
     ){
-        return createCacheConsumer(
-                "utdanning.elev.skoleressurs",
-                SkoleressursResource.class,
-                skoleressursResourceCache
+        ListenerContainerFactory<SkoleressursResource,EntityTopicNameParameters,EntityTopicNamePatternParameters> skoleressursConsumerFactory
+                = entityConsumerFactoryService.createFactory(
+                        SkoleressursResource.class,
+                consumerRecord -> {
+                    String personalressursHref = consumerRecord.value().getPersonalressurs().get(0).getHref();
+                    String key = personalressursHref.substring(personalressursHref.lastIndexOf("/") +1);
+                    skoleressursResourceCache.put(
+                                   key,
+                                   consumerRecord.value()
+                           );
+                    Long numberOfUndervisningsforhold = (long) consumerRecord.value().getUndervisningsforhold().size();
+                    employeeInSchoolCache.put(
+                            key,
+                            numberOfUndervisningsforhold
+                    );
+
+                    log.info("Skoleressurs saved to cache: " + key);
+                }
+
         );
+
+        return skoleressursConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("utdanning-elev-skoleressurs").build());
     }
 
     @Bean
