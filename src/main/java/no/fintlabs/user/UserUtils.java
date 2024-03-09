@@ -38,9 +38,11 @@ public class UserUtils {
 
 
     public enum UserType {
-        EMPLOYEE,
+        EMPLOYEESTAFF,
+        EMPLOYEEFACULTY,
         STUDENT,
-        EXTERNAL
+        AFFILIATE
     }
 
 }
+

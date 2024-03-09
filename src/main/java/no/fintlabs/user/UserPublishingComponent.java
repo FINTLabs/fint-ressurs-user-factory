@@ -6,11 +6,13 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
+import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fintlabs.azureUser.AzureUserService;
 import no.fintlabs.resourceServices.ArbeidsforholdService;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.resourceServices.PersonService;
 import no.fintlabs.resourceServices.PersonalressursService;
+import no.fintlabs.resourceServices.SkoleressursService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,19 +28,21 @@ public class UserPublishingComponent {
     private final AzureUserService azureUserService;
     private final ArbeidsforholdService arbeidsforholdService;
     private final UserEntityProducerService userEntityProducerService;
+    private final SkoleressursService skoleressursService;
 
     public UserPublishingComponent(
             PersonService personService,
             PersonalressursService personalressursService,
             ArbeidsforholdService arbeidsforholdService,
             AzureUserService azureUserService,
-            UserEntityProducerService userEntityProducerService
+            UserEntityProducerService userEntityProducerService, SkoleressursService skoleressursService
     ) {
         this.personService = personService;
         this.personalressursService = personalressursService;
         this.arbeidsforholdService = arbeidsforholdService;
         this.azureUserService = azureUserService;
         this.userEntityProducerService = userEntityProducerService;
+        this.skoleressursService = skoleressursService;
     }
 
     @Scheduled(
@@ -149,13 +153,17 @@ public class UserPublishingComponent {
         String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIV")
                 && fintStatus.equals("ACTIV")?"ACTIV":"DISABLED";
 
+        String userType = skoleressursService.isEmployeeInSchool(resourceId)
+                ?String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
+                :String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
+
 
         return User
                 .builder()
                 .resourceId(resourceId)
                 .firstName(personResource.getNavn().getFornavn())
                 .lastName(personResource.getNavn().getEtternavn())
-                .userType(String.valueOf(UserUtils.UserType.EMPLOYEE))
+                .userType(userType)
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
                 .organisationUnitIds(additionalArbeidsteder)
