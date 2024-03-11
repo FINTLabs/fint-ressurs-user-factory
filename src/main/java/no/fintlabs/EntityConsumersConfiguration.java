@@ -134,17 +134,6 @@ public class EntityConsumersConfiguration {
         );
     }
 
-//    @Bean
-//    ConcurrentMessageListenerContainer<String, SkoleressursResource> SkoleressursResourceEntityConsumer(
-//            FintCache<String,SkoleressursResource> skoleressursResourceCache
-//    ){
-//        return createCacheConsumer(
-//                "utdanning.elev.skoleressurs",
-//                SkoleressursResource.class,
-//                skoleressursResourceCache
-//        );
-//    }
-
     @Bean
     ConcurrentMessageListenerContainer<String, SkoleressursResource> skoleressursResourceEntityConsumer(
             FintCache<String, SkoleressursResource> skoleressursResourceCache,
@@ -165,10 +154,7 @@ public class EntityConsumersConfiguration {
                             key,
                             numberOfUndervisningsforhold
                     );
-
-                    log.info("Skoleressurs saved to cache: " + key);
                 }
-
         );
 
         return skoleressursConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("utdanning-elev-skoleressurs").build());

@@ -1,7 +1,6 @@
 package no.fintlabs.resourceServices;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fintlabs.cache.FintCache;
 import org.springframework.stereotype.Service;
 

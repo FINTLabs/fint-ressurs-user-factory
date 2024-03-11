@@ -7,7 +7,6 @@ import no.fint.model.resource.utdanning.elev.ElevforholdResource;
 import no.fintlabs.resourceServices.GyldighetsperiodeService;
 
 import java.util.Date;
-import java.util.Optional;
 @Slf4j
 public class UserUtils {
     private static final GyldighetsperiodeService gyldighetsperiodeService = new GyldighetsperiodeService();

@@ -6,7 +6,6 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
-import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fintlabs.azureUser.AzureUserService;
 import no.fintlabs.resourceServices.ArbeidsforholdService;
 import no.fintlabs.links.ResourceLinkUtil;
