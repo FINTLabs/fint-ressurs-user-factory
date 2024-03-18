@@ -8,6 +8,7 @@ import no.fint.model.resource.administrasjon.personal.PersonalressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fint.model.resource.utdanning.elev.ElevResource;
 import no.fint.model.resource.utdanning.elev.ElevforholdResource;
+import no.fint.model.resource.utdanning.elev.SkoleressursResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
@@ -131,6 +132,32 @@ public class EntityConsumersConfiguration {
                 SkoleResource.class,
                 skoleResourceCache
         );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, SkoleressursResource> skoleressursResourceEntityConsumer(
+            FintCache<String, SkoleressursResource> skoleressursResourceCache,
+            FintCache<String,Long> employeeInSchoolCache
+    ){
+        ListenerContainerFactory<SkoleressursResource,EntityTopicNameParameters,EntityTopicNamePatternParameters> skoleressursConsumerFactory
+                = entityConsumerFactoryService.createFactory(
+                        SkoleressursResource.class,
+                consumerRecord -> {
+                    String personalressursHref = consumerRecord.value().getPersonalressurs().get(0).getHref();
+                    String key = personalressursHref.substring(personalressursHref.lastIndexOf("/") +1);
+                    skoleressursResourceCache.put(
+                                   key,
+                                   consumerRecord.value()
+                           );
+                    Long numberOfUndervisningsforhold = (long) consumerRecord.value().getUndervisningsforhold().size();
+                    employeeInSchoolCache.put(
+                            key,
+                            numberOfUndervisningsforhold
+                    );
+                }
+        );
+
+        return skoleressursConsumerFactory.createContainer(EntityTopicNameParameters.builder().resource("utdanning-elev-skoleressurs").build());
     }
 
     @Bean
