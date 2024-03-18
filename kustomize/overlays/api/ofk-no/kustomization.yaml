@@ -16,12 +16,29 @@ patches:
       - op: replace
         path: "/spec/orgId"
         value: "ofk.no"
+      - op: add
+        path: "/spec/resources"
+        value:
+          limits:
+            cpu: "1000m"
+            memory: "1000Mi"
+          requests:
+            cpu: "500m"
+            memory: "500Mi"
       - op: replace
         path: "/spec/kafka/acls/0/topic"
         value: "ofk-no.kontroll.*"
       - op: replace
         path: "/spec/kafka/acls/1/topic"
         value: "ofk-no.kontroll.*"
+      - op: replace
+        path: "/spec/env/3/value"
+        value: "ofk-no-fint-kontroll-user-factory"
+      - op: add
+        path: "/spec/env/4"
+        value:
+         name: "JAVA_TOOL_OPTIONS"
+         value: "-XX:+ExitOnOutOfMemoryError -Xmx896m -verbose:gc"
     target:
       kind: Application
       name: fint-kontroll-user-factory
