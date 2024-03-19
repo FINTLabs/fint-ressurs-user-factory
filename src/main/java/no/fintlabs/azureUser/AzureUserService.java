@@ -28,7 +28,7 @@ public class AzureUserService {
             azureUserAttributes.put("azureStatus", azureUser.isAccountEnabled()?"ACTIV" :"DISABLED");
         }
         else {
-            log.info("No match for employeeId or studentId {} in azureusercache",
+            log.debug("No match for employeeId or studentId {} in azureusercache",
                     employeeIdORStudentId);
             return Optional.empty();
         }

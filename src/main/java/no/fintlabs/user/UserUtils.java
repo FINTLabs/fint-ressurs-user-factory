@@ -30,7 +30,7 @@ public class UserUtils {
                 ?"ACTIV"
                 :"DISABLED";
 
-        log.info("Systemid: " + resoursID + " stop: " + elevforhold.getGyldighetsperiode().getSlutt() + "Status: " + status);
+        log.debug("Systemid: " + resoursID + " stop: " + elevforhold.getGyldighetsperiode().getSlutt() + "Status: " + status);
 
         return status;
     }

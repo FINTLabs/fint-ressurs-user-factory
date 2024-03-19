@@ -53,4 +53,6 @@ public class ResourceLinkUtil {
 
     public static String organisasjonsIdToLowerCase(String path) {return path.replace("organisasjonsId", "organisasjonsid");}
 
+    public static String organisasjonsKodeToLowerCase(String path) {return path.replace("organisasjonsKode", "organisasjonskode");}
+
 }
