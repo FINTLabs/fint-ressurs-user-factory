@@ -24,7 +24,7 @@ patches:
             memory: "8000Mi"
           requests:
             cpu: "500m"
-            memory: "1000Mi"
+            memory: "2000Mi"
       - op: replace
         path: "/spec/kafka/acls/0/topic"
         value: "afk-no.kontroll.*"
