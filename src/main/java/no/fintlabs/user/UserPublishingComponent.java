@@ -145,7 +145,7 @@ public class UserPublishingComponent {
             Date statusChanged
     ) {
 
-        log.info("**** orgunitId: " + organisasjonsId + " :: orgUnitName: " + organisasjonsnavn + " :: resourcID:" + resourceId + " ****");
+        //log.info("**** orgunitId: " + organisasjonsId + " :: orgUnitName: " + organisasjonsnavn + " :: resourcID:" + resourceId + " ****");
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
