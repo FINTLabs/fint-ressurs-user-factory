@@ -88,7 +88,7 @@ public class ElevforholdService {
     public Optional<OrganisasjonselementResource> getSkoleOrgUnit(SkoleResource skoleResource, Date currentTime){
         // legg inn sjekk på null
         String skoleOrgUnitref = skoleResource.getOrganisasjon().get(0).getHref();
-        //Legg på sjekk på null + normalisering av strenger
+        //Legg på sjekk på null
         OrganisasjonselementResource organisasjonselementResource = organisasjonselementResourceCache
                 .get(ResourceLinkUtil.organisasjonsKodeToLowerCase(skoleOrgUnitref));
         return Optional.ofNullable(organisasjonselementResource);

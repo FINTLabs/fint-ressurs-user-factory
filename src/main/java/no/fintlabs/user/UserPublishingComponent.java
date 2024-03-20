@@ -145,6 +145,8 @@ public class UserPublishingComponent {
             Date statusChanged
     ) {
 
+        log.info("**** orgunitId: " + organisasjonsId + " :: orgUnitName: " + organisasjonsnavn + " :: resourcID:" + resourceId + " ****");
+
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
@@ -155,6 +157,8 @@ public class UserPublishingComponent {
         String userType = skoleressursService.isEmployeeInSchool(resourceId)
                 ?String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
                 :String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
+
+
 
 
         return User
