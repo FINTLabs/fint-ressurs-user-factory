@@ -12,7 +12,12 @@ fint:
       org-id: ${fint.org-id}
       domain-context: kontroll
   kontroll:
-    days-before-start: 30
+    days-before-start: 0
+    user:
+      publishing:
+        initial-delay: 20000
+        initial-delay-elev: 30000
+        fixed-delay: 20000
 spring:
   security:
     oauth2:
