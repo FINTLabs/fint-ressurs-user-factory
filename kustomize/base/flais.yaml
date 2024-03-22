@@ -11,9 +11,9 @@ spec:
     - name: fint.kontroll.user.publishing.initial-delay
       value: '20000'
     - name: fint.kontroll.user.publishing.initial-delay-elev
-      value: '25000'
+      value: '30000'
     - name: fint.kontroll.user.publishing.fixed-delay
-      value: '20000'
+      value: '900000'
     - name: spring.kafka.consumer.group-id
       value: 'fint-kontroll-user-factory'
   kafka:
