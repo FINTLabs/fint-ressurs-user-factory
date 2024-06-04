@@ -34,7 +34,8 @@ public class UserPublishingComponent {
             PersonalressursService personalressursService,
             ArbeidsforholdService arbeidsforholdService,
             AzureUserService azureUserService,
-            UserEntityProducerService userEntityProducerService, SkoleressursService skoleressursService
+            UserEntityProducerService userEntityProducerService,
+            SkoleressursService skoleressursService
     ) {
         this.personService = personService;
         this.personalressursService = personalressursService;
@@ -59,19 +60,23 @@ public class UserPublishingComponent {
 
         List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allUsersInCache);
 
-        log.info("Published {} of {} users in cache", publishedUsers.size(), allUsersInCache.size());
+        log.info("Published {} of {} employee users in cache", publishedUsers.size(), allUsersInCache.size());
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
+
+
+        String resourceId = personalressursService.getResourceId(personalressursResource);
+        boolean isUserOnKafka = UserUtils.isUserAlreadyOnKafka(resourceId);
 
         Optional<PersonResource> personResourceOptional = personService.getPerson(personalressursResource);
         if (personResourceOptional.isEmpty()) {
             return Optional.empty();
         }
 
-        //Hovedstilling
+        //Hovedstilling eller stilling med høyest stillingsprosent hvis hovedstilling ikke er spesifisert
         Optional<ArbeidsforholdResource> arbeidsforholdOptional =
-                arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime);
+                arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime,resourceId);
         if (arbeidsforholdOptional.isEmpty()) {
             return Optional.empty();
         }
@@ -85,7 +90,7 @@ public class UserPublishingComponent {
 
             List<ArbeidsforholdResource> additionalArbeidsforhold =
                     arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
-                            currentTime);
+                            currentTime, resourceId);
 
             List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
                     arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
@@ -103,14 +108,22 @@ public class UserPublishingComponent {
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
 
         //Azure attributes
-        String hrefSelfLink = ResourceLinkUtil.getFirstSelfLink(personalressursResource);
-        String resourceId = hrefSelfLink.substring(hrefSelfLink.lastIndexOf("/") +1);
         Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
-        if (azureUserAttributes.isEmpty()){
+        if (azureUserAttributes.isEmpty() && !isUserOnKafka){
             return Optional.empty();
         }
+        if (azureUserAttributes.isEmpty()){
+            Map<String,String> attributes = new HashMap<>();
+            User userOnKafka = UserUtils.getUserFromKafka(resourceId);
+            attributes.put("email", userOnKafka.getEmail());
+            attributes.put("userName", userOnKafka.getUserName());
+            attributes.put("identityProviderUserObjectId",userOnKafka.getIdentityProviderUserObjectId().toString());
+            attributes.put("azureStatus", userOnKafka.getStatus());
+            azureUserAttributes = Optional.of(attributes);
+        }
 
-        String fintStatus = UserUtils.getUserStatus(personalressursResource,currentTime );
+
+        String fintStatus = UserUtils.getFINTAnsattStatus(personalressursResource,currentTime );
         Date statusChanged = fintStatus.equals("ACTIV")
                 ?personalressursResource.getAnsettelsesperiode().getStart()
                 :personalressursResource.getAnsettelsesperiode().getSlutt();
@@ -145,7 +158,6 @@ public class UserPublishingComponent {
             Date statusChanged
     ) {
 
-        //log.info("**** orgunitId: " + organisasjonsId + " :: orgUnitName: " + organisasjonsnavn + " :: resourcID:" + resourceId + " ****");
 
         String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
                 .map(Kontaktinformasjon::getMobiltelefonnummer)

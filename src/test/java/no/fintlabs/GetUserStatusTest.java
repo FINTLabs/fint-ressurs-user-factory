@@ -38,7 +38,7 @@ class GetUserStatusTest {
         personalressurs.setAnsettelsesperiode(periode);
         personalressurs.setAnsattnummer(ansattnummer);
         Date currentTime = Date.from(Instant.now());
-        String statusFromGetUserStatus = UserUtils.getUserStatus(personalressurs,currentTime);
+        String statusFromGetUserStatus = UserUtils.getFINTAnsattStatus(personalressurs,currentTime);
 
         assertThat(statusFromGetUserStatus).isEqualTo("ACTIV");
 
@@ -61,7 +61,7 @@ class GetUserStatusTest {
         personalressursResource.setAnsettelsesperiode(periode);
         personalressursResource.setAnsattnummer(ansattnummer);
         Date currentTime = Date.from(Instant.now());
-        String statusFromGetUserStatus = UserUtils.getUserStatus(personalressursResource,currentTime);
+        String statusFromGetUserStatus = UserUtils.getFINTAnsattStatus(personalressursResource,currentTime);
 
         assertThat(statusFromGetUserStatus).isEqualTo("DISABLED");
 

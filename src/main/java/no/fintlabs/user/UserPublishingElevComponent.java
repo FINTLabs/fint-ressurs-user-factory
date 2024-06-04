@@ -98,7 +98,7 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
-        String fintStatus = UserUtils.getUserElevStatus(elevforholdOptional.get(),currentTime);
+        String fintStatus = UserUtils.getFINTElevStatus(elevforholdOptional.get(),currentTime);
         Date statusChanged = fintStatus.equals("ACTIV")
                 ?elevforholdOptional.get().getGyldighetsperiode().getStart()
                 :elevforholdOptional.get().getGyldighetsperiode().getSlutt();
