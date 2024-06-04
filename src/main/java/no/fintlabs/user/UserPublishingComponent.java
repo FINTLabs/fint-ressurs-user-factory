@@ -51,16 +51,16 @@ public class UserPublishingComponent {
     )
     public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-        List<User> allUsersInCache = personalressursService.getAllUsersfromCache()
+        List<User> allEmployeeUsers = personalressursService.getAllUsersfromCache()
                 .stream()
                 .map(personalressursResource -> createUser(personalressursResource, currentTime))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allUsersInCache);
+        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allEmployeeUsers);
 
-        log.info("Published {} of {} employee users in cache", publishedUsers.size(), allUsersInCache.size());
+        log.info("Published {} of {} employee users in cache", publishedUsers.size(), allEmployeeUsers.size());
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {

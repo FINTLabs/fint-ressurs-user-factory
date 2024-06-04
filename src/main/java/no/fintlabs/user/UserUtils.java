@@ -42,7 +42,7 @@ public class UserUtils {
                 ?"ACTIV"
                 :"DISABLED";
 
-        log.debug("Systemid: " + resoursID + " stop: " + elevforhold.getGyldighetsperiode().getSlutt() + "Status: " + status);
+        log.debug("Systemid: {} stop: {}Status: {}", resoursID, elevforhold.getGyldighetsperiode().getSlutt(), status);
 
         return status;
     }
@@ -59,8 +59,6 @@ public class UserUtils {
 
         return userFromKafka.orElse(null);
     }
-
-
 
 
     public enum UserType {

@@ -46,11 +46,11 @@ public class ElevforholdService {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
-        return getValidElevforhold(elevforholdResources, currentTime);
+        return getAllElevforhold(elevforholdResources, currentTime);
     }
 
 
-    private Optional<ElevforholdResource> getValidElevforhold(
+    private Optional<ElevforholdResource> getAllElevforhold(
             List<ElevforholdResource> elevforholdResources, Date currentTime
     ){
         return elevforholdResources
