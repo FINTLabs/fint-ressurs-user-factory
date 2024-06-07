@@ -45,16 +45,16 @@ public class UserPublishingElevComponent {
     public void publishElevUsers(){
         Date currentTime = Date.from(Instant.now());
 
-        List<User> validElevUsers = elevService.getAllValidElever(currentTime)
+        List<User> allElevUsers = elevService.getAllEleverWithElevforhold(currentTime)
                 .stream()
                 .map(elevResource -> createUser(elevResource,currentTime))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        List<User> publishedElevUsers = userEntityProducerService.publishChangedUsers(validElevUsers);
+        List<User> publishedElevUsers = userEntityProducerService.publishChangedUsers(allElevUsers);
 
-        log.info("Published {} of {} valid users (students) ", publishedElevUsers.size(), validElevUsers.size());
+        log.info("Published {} of {} students users in cache ", publishedElevUsers.size(), allElevUsers.size());
         log.debug("Ids of published users (students) : {}",
                 publishedElevUsers.stream()
                         .map(User::getResourceId)
@@ -98,7 +98,7 @@ public class UserPublishingElevComponent {
             return Optional.empty();
         }
 
-        String fintStatus = UserUtils.getUserElevStatus(elevforholdOptional.get(),currentTime);
+        String fintStatus = UserUtils.getFINTElevStatus(elevforholdOptional.get(),currentTime);
         Date statusChanged = fintStatus.equals("ACTIV")
                 ?elevforholdOptional.get().getGyldighetsperiode().getStart()
                 :elevforholdOptional.get().getGyldighetsperiode().getSlutt();

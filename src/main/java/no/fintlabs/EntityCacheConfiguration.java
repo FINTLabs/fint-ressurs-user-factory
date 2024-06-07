@@ -11,6 +11,7 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fintlabs.azureUser.AzureUser;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
+import no.fintlabs.user.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -68,10 +69,14 @@ public class EntityCacheConfiguration {
     FintCache<String, Long> employeeInSchoolCache() {return createCache(Long.class);}
 
 
+//    @Bean
+//    FintCache<String, Integer> publishedUserHashCache() {
+//        return createCache(Integer.class);
+//    }
+
     @Bean
-    FintCache<String, Integer> publishedUserHashCache() {
-        return createCache(Integer.class);
-    }
+    FintCache<String, User> publishUserCache() { return createCache(User.class);}
+
 
     private <V> FintCache<String, V> createCache(Class<V> resourceClass) {
         return fintCacheManager.createCache(
@@ -80,5 +85,10 @@ public class EntityCacheConfiguration {
                 resourceClass
         );
     }
+
+
+
+
+
 
 }

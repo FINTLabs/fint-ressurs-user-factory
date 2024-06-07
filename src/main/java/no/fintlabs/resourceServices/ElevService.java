@@ -23,7 +23,7 @@ public class ElevService {
         this.gyldighetsperiodeService = gyldighetsperiodeService;
     }
 
-    public List<ElevResource> getAllValidElever(Date currentTime){
+    public List<ElevResource> getAllEleverWithElevforhold(Date currentTime){
         List<ElevResource> elevResources = elevResourceCache
                 .getAllDistinct()
                 .stream()

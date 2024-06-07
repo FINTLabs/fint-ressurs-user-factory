@@ -14,16 +14,16 @@ import java.util.List;
 @Service
 @Slf4j
 public class UserEntityProducerService {
-    private final FintCache<String, Integer> publishedUserHashCache;
+    private final FintCache<String, User> publishedUserCache;
     private final EntityProducer<User> entityProducer;
     private final EntityTopicNameParameters entityTopicNameParameters;
 
     public UserEntityProducerService(
             EntityProducerFactory entityProducerFactory,
             EntityTopicService entityTopicService,
-            FintCache<String, Integer> publishedUserHashCache
+            FintCache<String, User> publishedUserCache
     ) {
-        this.publishedUserHashCache = publishedUserHashCache;
+        this.publishedUserCache = publishedUserCache;
         entityProducer = entityProducerFactory.createProducer(User.class);
         entityTopicNameParameters = EntityTopicNameParameters
                 .builder()
@@ -35,9 +35,9 @@ public class UserEntityProducerService {
     public List<User> publishChangedUsers(List<User> users) {
         return users
                 .stream()
-                .filter(user -> publishedUserHashCache
+                .filter(user -> publishedUserCache
                         .getOptional(user.getResourceId())
-                        .map(publishedUserHash -> publishedUserHash != user.hashCode())
+                        .map(publishedUserHash -> publishedUserHash.hashCode() != user.hashCode())
                         .orElse(true)
                 )
                 .peek(this::publishChangedUsers)
