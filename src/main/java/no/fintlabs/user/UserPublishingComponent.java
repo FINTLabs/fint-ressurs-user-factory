@@ -124,7 +124,7 @@ public class UserPublishingComponent {
 
 
         String fintStatus = UserUtils.getFINTAnsattStatus(personalressursResource,currentTime );
-        Date statusChanged = fintStatus.equals("ACTIV")
+        Date statusChanged = fintStatus.equals("ACTIVE")
                 ?personalressursResource.getAnsettelsesperiode().getStart()
                 :personalressursResource.getAnsettelsesperiode().getSlutt();
 
@@ -163,8 +163,8 @@ public class UserPublishingComponent {
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIV")
-                && fintStatus.equals("ACTIV")?"ACTIV":"DISABLED";
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
+                && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
 
         String userType = skoleressursService.isEmployeeInSchool(resourceId)
                 ?String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)

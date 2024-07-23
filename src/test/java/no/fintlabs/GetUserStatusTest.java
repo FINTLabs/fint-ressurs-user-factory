@@ -40,7 +40,7 @@ class GetUserStatusTest {
         Date currentTime = Date.from(Instant.now());
         String statusFromGetUserStatus = UserUtils.getFINTAnsattStatus(personalressurs,currentTime);
 
-        assertThat(statusFromGetUserStatus).isEqualTo("ACTIV");
+        assertThat(statusFromGetUserStatus).isEqualTo("ACTIVE");
 
         System.out.println("getUserStatus returns: " + statusFromGetUserStatus);
 

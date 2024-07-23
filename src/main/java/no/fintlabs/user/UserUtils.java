@@ -31,7 +31,7 @@ public class UserUtils {
         Periode gyldighetsPeriode = personalressursResource.getAnsettelsesperiode();
 
         return gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime)
-                ?"ACTIV"
+                ?"ACTIVE"
                 :"DISABLED";
     }
 
@@ -39,7 +39,7 @@ public class UserUtils {
         String resoursID = elevforhold.getSystemId().getIdentifikatorverdi();
         Periode gyldighetsperiode = elevforhold.getGyldighetsperiode();
         String status = gyldighetsperiodeService.isValid(gyldighetsperiode,currentTime)
-                ?"ACTIV"
+                ?"ACTIVE"
                 :"DISABLED";
 
         log.debug("Systemid: {} stop: {}Status: {}", resoursID, elevforhold.getGyldighetsperiode().getSlutt(), status);
