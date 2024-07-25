@@ -25,7 +25,7 @@ public class AzureUserService {
             azureUserAttributes.put("email", azureUser.getMail());
             azureUserAttributes.put("userName", azureUser.getUserPrincipalName());
             azureUserAttributes.put("identityProviderUserObjectId", azureUser.getId());
-            azureUserAttributes.put("azureStatus", azureUser.isAccountEnabled()?"ACTIV" :"DISABLED");
+            azureUserAttributes.put("azureStatus", azureUser.isAccountEnabled()?"ACTIVE" :"DISABLED");
         }
         else {
             log.debug("No match for employeeId or studentId {} in azureusercache",

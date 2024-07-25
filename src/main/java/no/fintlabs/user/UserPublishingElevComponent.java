@@ -99,7 +99,7 @@ public class UserPublishingElevComponent {
         }
 
         String fintStatus = UserUtils.getFINTElevStatus(elevforholdOptional.get(),currentTime);
-        Date statusChanged = fintStatus.equals("ACTIV")
+        Date statusChanged = fintStatus.equals("ACTIVE")
                 ?elevforholdOptional.get().getGyldighetsperiode().getStart()
                 :elevforholdOptional.get().getGyldighetsperiode().getSlutt();
 
@@ -135,8 +135,8 @@ public class UserPublishingElevComponent {
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIV")
-                && fintStatus.equals("ACTIV")?"ACTIV":"DISABLED";
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
+                && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
 
 
         return User.builder()
