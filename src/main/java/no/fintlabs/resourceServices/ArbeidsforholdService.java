@@ -7,6 +7,7 @@ import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.links.ResourceLinkUtil;
 import no.fintlabs.user.UserUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,6 +15,9 @@ import java.util.*;
 @Service
 @Slf4j
 public class ArbeidsforholdService {
+
+    @Value("${fint.kontroll.user.days-before-start-employee:0}")
+    private static int daysBeforeStartEmployee;
 
     private final GyldighetsperiodeService gyldighetsperiodeService;
     private final FintCache<String, ArbeidsforholdResource> arbeidsforholdResourceCache;
@@ -86,7 +90,7 @@ public class ArbeidsforholdService {
                 arbeidsforholdResource.getArbeidsforholdsperiode() != null
                         ? arbeidsforholdResource.getArbeidsforholdsperiode()
                         : arbeidsforholdResource.getGyldighetsperiode(),
-                currentTime
+                currentTime,daysBeforeStartEmployee
         );
     }
 
@@ -107,7 +111,7 @@ public class ArbeidsforholdService {
                 .map(ResourceLinkUtil::organisasjonsIdToLowerCase)
                 .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
-                        gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime));
+                        gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime,daysBeforeStartEmployee));
 
 
         return organisasjonselementResoureOptional;

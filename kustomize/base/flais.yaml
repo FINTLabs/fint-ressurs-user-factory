@@ -14,6 +14,7 @@ spec:
       value: '30000'
     - name: fint.kontroll.user.publishing.fixed-delay
       value: '300000'
+    - name: fint.kontroll.user.days-before-start
     - name: spring.kafka.consumer.group-id
       value: 'fint-kontroll-user-factory'
   kafka:
