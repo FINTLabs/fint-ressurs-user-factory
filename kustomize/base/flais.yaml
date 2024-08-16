@@ -4,7 +4,7 @@ metadata:
   name: fint-kontroll-user-factory
   namespace: fintlabs-no
 spec:
-  orgId: fintlabs.no
+  orgId: orgid
   image: ghcr.io/fintlabs/fint-kontroll-user-factory:latest
   imagePullPolicy: Always
   env:
