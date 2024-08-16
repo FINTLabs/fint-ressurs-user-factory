@@ -17,6 +17,8 @@ fint:
         initial-delay: 20000
         initial-delay-elev: 30000
         fixed-delay: 900000
+      days-before-start-employee: 0
+      days-before-start-student: 0
 spring:
   kafka:
     consumer:
