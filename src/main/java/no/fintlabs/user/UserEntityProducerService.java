@@ -33,8 +33,9 @@ public class UserEntityProducerService {
     }
 
     public List<User> publishChangedUsers(List<User> users) {
-        return users
+        List<User> list = users
                 .stream()
+                //.peek(user -> log.info("Her er'n:::" + user.getResourceId()))
                 .filter(user -> publishedUserCache
                         .getOptional(user.getResourceId())
                         .map(publishedUserHash -> publishedUserHash.hashCode() != user.hashCode())
@@ -42,6 +43,8 @@ public class UserEntityProducerService {
                 )
                 .peek(this::publishChangedUsers)
                 .toList();
+
+        return list;
 
     }
 

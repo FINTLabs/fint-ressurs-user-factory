@@ -2,7 +2,6 @@ package no.fintlabs.resourceServices;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Periode;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -12,23 +11,35 @@ import java.util.Date;
 @Slf4j
 public class GyldighetsperiodeService {
 
-    @Value("${fint.kontroll.days-before-start:0}")
-    private int daysBeforeStart;
-
     public static class NullPeriodeException extends RuntimeException {
     }
 
-    public boolean isValid(Periode gyldighetsperiode, Date currentTime) {
+//    public boolean isValid(Periode gyldighetsperiode, Date currentTime) {
+//        if (gyldighetsperiode == null) {
+//            throw new NullPeriodeException();
+//        }
+//
+//        Date startInit = gyldighetsperiode.getStart();
+//        Date start = getStartDate(startInit,daysBeforeStart);
+//
+//        return currentTime.after(start)
+//                && isEndValid(gyldighetsperiode.getSlutt(), currentTime);
+//    }
+
+    public boolean isValid(Periode gyldighetsperiode, Date currentTime, int days) {
         if (gyldighetsperiode == null) {
             throw new NullPeriodeException();
         }
-
         Date startInit = gyldighetsperiode.getStart();
-        Date start = getStartDate(startInit,daysBeforeStart);
+        Date start = getStartDate(startInit,days);
+
+
 
         return currentTime.after(start)
                 && isEndValid(gyldighetsperiode.getSlutt(), currentTime);
+
     }
+
 
     private boolean isEndValid(Date end, Date currentTime) {
 

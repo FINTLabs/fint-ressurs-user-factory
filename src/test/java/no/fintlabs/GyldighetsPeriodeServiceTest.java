@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import no.fintlabs.resourceServices.GyldighetsperiodeService.NullPeriodeException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,8 +15,11 @@ import java.util.Date;
 
 class GyldighetsPeriodeServiceTest {
 
+
     private GyldighetsperiodeService gyldighetsperiodeService;
     private Date currentTime;
+
+    private static final int daysBeforeStart= 10;
 
     @BeforeEach
     public void initEachTest(){
@@ -53,7 +57,7 @@ class GyldighetsPeriodeServiceTest {
         gyldighetsPeriode.setSlutt(sluttDate);
         gyldighetsPeriode.setStart(startDate);
 
-        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime);
+        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime,daysBeforeStart);
 
         assertTrue(valid);
 
@@ -62,7 +66,8 @@ class GyldighetsPeriodeServiceTest {
     @Test
     public void shouldThrowNullPeriodeExeptionGyldihetsperiodeIsNull(){
 
-        assertThrows(NullPeriodeException.class, () -> gyldighetsperiodeService.isValid(null,currentTime));
+        assertThrows(NullPeriodeException.class, () -> gyldighetsperiodeService.isValid(null
+                ,currentTime,daysBeforeStart));
 
     }
 
@@ -77,7 +82,7 @@ class GyldighetsPeriodeServiceTest {
         gyldighetsPeriode.setSlutt(sluttDate);
         gyldighetsPeriode.setStart(startDate);
 
-        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime);
+        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime,daysBeforeStart);
 
         assertFalse(valid);
     }
@@ -92,7 +97,7 @@ class GyldighetsPeriodeServiceTest {
         gyldighetsPeriode.setSlutt(sluttDate);
         gyldighetsPeriode.setStart(startDate);
 
-        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime);
+        boolean valid = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime,daysBeforeStart);
 
         assertTrue(valid);
     }
