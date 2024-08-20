@@ -51,16 +51,20 @@ public class UserPublishingComponent {
     )
     public void publishUsers() {
         Date currentTime = Date.from(Instant.now());
-        List<User> allEmployeeUsers = personalressursService.getAllUsersfromCache()
+        log.info("<< Start scheduled import of employees >>");
+        List<PersonalressursResource> allEmployeesWithArbeidsforhold = personalressursService.getAllUsersfromCache();
+
+        List<User> allValidEmployeeUsers = allEmployeesWithArbeidsforhold
                 .stream()
                 .map(personalressursResource -> createUser(personalressursResource, currentTime))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allEmployeeUsers);
-
-        log.info("Published {} of {} employee users in cache", publishedUsers.size(), allEmployeeUsers.size());
+        List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allValidEmployeeUsers);
+        log.info("Number of personalressurs read from kafka: {}", publishedUsers.size());
+        log.info("Published {} of {} employee users in cache", publishedUsers.size(), allValidEmployeeUsers.size());
+        log.info("<< End scheduled import of employees >>");
     }
 
     private Optional<User> createUser(PersonalressursResource personalressursResource, Date currentTime) {
@@ -71,62 +75,64 @@ public class UserPublishingComponent {
 
         Optional<PersonResource> personResourceOptional = personService.getPerson(personalressursResource);
         if (personResourceOptional.isEmpty()) {
+            log.info("Creating user failed, resourceId={}, missing personResource", resourceId);
             return Optional.empty();
         }
 
         //Hovedstilling eller stilling med høyest stillingsprosent hvis hovedstilling ikke er spesifisert
         Optional<ArbeidsforholdResource> arbeidsforholdOptional =
-                arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime,resourceId);
+                arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime, resourceId);
         if (arbeidsforholdOptional.isEmpty()) {
+            log.info("Creating user failed, resourceId={}, missing arbeidsforhold", resourceId);
             return Optional.empty();
         }
         Optional<OrganisasjonselementResource> hovedArbeidsstedOptional = arbeidsforholdOptional
                 .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
 
 
-
         //Additional orgunits
         List<String> additionalArbeidssteder = new ArrayList<>();
 
-            List<ArbeidsforholdResource> additionalArbeidsforhold =
-                    arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
-                            currentTime, resourceId);
+        List<ArbeidsforholdResource> additionalArbeidsforhold =
+                arbeidsforholdService.getAllValidArbeidsforholdAsList(personalressursResource.getArbeidsforhold(),
+                        currentTime, resourceId);
 
-            List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
-                    arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
+        List<Optional<OrganisasjonselementResource>> additionalOrgUnits =
+                arbeidsforholdService.getAllArbeidssteder(additionalArbeidsforhold, currentTime);
 
-            if (!additionalOrgUnits.isEmpty()){
-                additionalArbeidssteder = additionalOrgUnits
-                        .stream()
-                        .filter(Optional::isPresent)
-                        .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
-                        .toList();
-            }
+        if (!additionalOrgUnits.isEmpty()) {
+            additionalArbeidssteder = additionalOrgUnits
+                    .stream()
+                    .filter(Optional::isPresent)
+                    .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
+                    .toList();
+        }
 
 
         Optional<String> lederPersonalressursLinkOptional = hovedArbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
 
         //Azure attributes
-        Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
-        if (azureUserAttributes.isEmpty() && !isUserOnKafka){
+        Optional<Map<String, String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        if (azureUserAttributes.isEmpty() && !isUserOnKafka) {
+            log.info("Creating user failed, resourceId={}, missing azureUserAttributes", resourceId);
             return Optional.empty();
         }
-        if (azureUserAttributes.isEmpty()){
-            Map<String,String> attributes = new HashMap<>();
+        if (azureUserAttributes.isEmpty()) {
+            Map<String, String> attributes = new HashMap<>();
             User userOnKafka = UserUtils.getUserFromKafka(resourceId);
             attributes.put("email", userOnKafka.getEmail());
             attributes.put("userName", userOnKafka.getUserName());
-            attributes.put("identityProviderUserObjectId",userOnKafka.getIdentityProviderUserObjectId().toString());
+            attributes.put("identityProviderUserObjectId", userOnKafka.getIdentityProviderUserObjectId().toString());
             attributes.put("azureStatus", userOnKafka.getStatus());
             azureUserAttributes = Optional.of(attributes);
         }
 
 
-        String fintStatus = UserUtils.getFINTAnsattStatus(personalressursResource,currentTime );
+        String fintStatus = UserUtils.getFINTAnsattStatus(personalressursResource, currentTime);
         Date statusChanged = fintStatus.equals("ACTIVE")
-                ?personalressursResource.getAnsettelsesperiode().getStart()
-                :personalressursResource.getAnsettelsesperiode().getSlutt();
+                ? personalressursResource.getAnsettelsesperiode().getStart()
+                : personalressursResource.getAnsettelsesperiode().getSlutt();
 
 
         return Optional.of(
@@ -134,8 +140,8 @@ public class UserPublishingComponent {
                         personalressursResource,
                         personResourceOptional.get(),
                         lederPersonalressursLinkOptional.orElse(""),
-                        hovedArbeidsstedOptional.isPresent()? hovedArbeidsstedOptional.get().getNavn():"mangler info",
-                        hovedArbeidsstedOptional.isPresent()? hovedArbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() :"mangler info",
+                        hovedArbeidsstedOptional.isPresent() ? hovedArbeidsstedOptional.get().getNavn() : "mangler info",
+                        hovedArbeidsstedOptional.isPresent() ? hovedArbeidsstedOptional.get().getOrganisasjonsId().getIdentifikatorverdi() : "mangler info",
                         additionalArbeidssteder,
                         azureUserAttributes.get(),
                         resourceId,
@@ -152,7 +158,7 @@ public class UserPublishingComponent {
             String organisasjonsnavn,
             String organisasjonsId,
             List<String> additionalArbeidsteder,
-            Map<String,String> azureUserAttributes,
+            Map<String, String> azureUserAttributes,
             String resourceId,
             String fintStatus,
             Date statusChanged
@@ -163,14 +169,12 @@ public class UserPublishingComponent {
                 .map(Kontaktinformasjon::getMobiltelefonnummer)
                 .orElse("");
 
-        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
-                && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus", "").equals("ACTIVE")
+                && fintStatus.equals("ACTIVE") ? "ACTIVE" : "DISABLED";
 
         String userType = skoleressursService.isEmployeeInSchool(resourceId)
-                ?String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
-                :String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
-
-
+                ? String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
+                : String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
 
 
         return User
@@ -184,9 +188,9 @@ public class UserPublishingComponent {
                 .organisationUnitIds(additionalArbeidsteder)
                 .mobilePhone(mobilePhone)
                 .managerRef(lederPersonalressursHref)
-                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
-                .email(azureUserAttributes.getOrDefault("email",""))
-                .userName(azureUserAttributes.getOrDefault("userName",""))
+                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId", "0-0-0-0-0")))
+                .email(azureUserAttributes.getOrDefault("email", ""))
+                .userName(azureUserAttributes.getOrDefault("userName", ""))
                 .status(userStatus)
                 .statusChanged(statusChanged)
                 .build();

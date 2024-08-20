@@ -43,10 +43,14 @@ public class UserUtils {
 
     public static String getFINTAnsattStatus(PersonalressursResource personalressursResource, Date currentTime) {
         Periode gyldighetsPeriode = personalressursResource.getAnsettelsesperiode();
-
-        return gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime, DAYS_BEFORE_START_EMPLOYEE)
+        String status = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime, DAYS_BEFORE_START_EMPLOYEE)
                 ?"ACTIVE"
                 :"DISABLED";
+        if (status.equals("DISABLED")){
+            log.info("User is DISABLED from FINT. FINT identifikator: {}", personalressursResource.getSystemId().getIdentifikatorverdi());
+        }
+
+        return status;
     }
 
     public static String getFINTElevStatus(ElevforholdResource elevforhold, Date currentTime) {
@@ -69,7 +73,7 @@ public class UserUtils {
 
     public static User getUserFromKafka(String resourceId){
         Optional<User> userFromKafka = publishUserCache.getOptional(resourceId);
-        log.info("userFromKafka: {}", userFromKafka);
+        log.info("Get user information from Kafka: {}", userFromKafka);
 
         return userFromKafka.orElse(null);
     }

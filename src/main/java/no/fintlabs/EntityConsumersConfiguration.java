@@ -193,20 +193,6 @@ public class EntityConsumersConfiguration {
     }
 
 
-
-//    @Bean
-//    ConcurrentMessageListenerContainer<String, User> userEntityConsumer(
-//            FintCache<String, Integer> publishedUserHashCache
-//    ) {
-//        return entityConsumerFactoryService.createFactory(
-//                User.class,
-//                consumerRecord -> publishedUserHashCache.put(
-//                        consumerRecord.value().getResourceId(),
-//                        consumerRecord.value().hashCode()
-//                )
-//        ).createContainer(EntityTopicNameParameters.builder().resource("user").build());
-//    }
-
     @Bean
     ConcurrentMessageListenerContainer<String,User> userResourceEntityConsumer(
             FintCache<String,User> publishUserCache

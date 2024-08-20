@@ -35,7 +35,6 @@ public class UserEntityProducerService {
     public List<User> publishChangedUsers(List<User> users) {
         List<User> list = users
                 .stream()
-                //.peek(user -> log.info("Her er'n:::" + user.getResourceId()))
                 .filter(user -> publishedUserCache
                         .getOptional(user.getResourceId())
                         .map(publishedUserHash -> publishedUserHash.hashCode() != user.hashCode())
