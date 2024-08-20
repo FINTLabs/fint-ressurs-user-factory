@@ -46,8 +46,9 @@ public class UserUtils {
         String status = gyldighetsperiodeService.isValid(gyldighetsPeriode,currentTime, DAYS_BEFORE_START_EMPLOYEE)
                 ?"ACTIVE"
                 :"DISABLED";
+
         if (status.equals("DISABLED")){
-            log.info("User is DISABLED from FINT. FINT identifikator: {}", personalressursResource.getSystemId().getIdentifikatorverdi());
+            log.info("User is DISABLED from FINT. FINT ansattnummer: {}", personalressursResource.getAnsattnummer().getIdentifikatorverdi());
         }
 
         return status;
