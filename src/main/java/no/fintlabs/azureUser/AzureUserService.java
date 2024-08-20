@@ -36,5 +36,9 @@ public class AzureUserService {
         return Optional.of(azureUserAttributes);
     }
 
+    public Long getNumberOfAzureUsersInCache(){
+        return azureUserCache.getNumberOfDistinctValues();
+    }
+
 
 }
