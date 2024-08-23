@@ -62,7 +62,7 @@ public class UserPublishingComponent {
                 .toList();
 
         List<User> publishedUsers = userEntityProducerService.publishChangedUsers(allValidEmployeeUsers);
-        log.info("Number of personalressurs read from kafka: {}", allEmployeesWithArbeidsforhold.size());
+        log.info("Number of personalressurs read from FINT: {}", allEmployeesWithArbeidsforhold.size());
         log.info("Number of users from Entra ID: {}",azureUserService.getNumberOfAzureUsersInCache());
         log.info("Published {} of {} employee users in cache", publishedUsers.size(), allValidEmployeeUsers.size());
         log.info("<< End scheduled import of employees >>");
