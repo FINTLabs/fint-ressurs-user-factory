@@ -177,6 +177,7 @@ public class UserPublishingComponent {
                 ? String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
                 : String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
 
+        log.info("Creating user with resourceId: {}",resourceId);
 
         return User
                 .builder()
