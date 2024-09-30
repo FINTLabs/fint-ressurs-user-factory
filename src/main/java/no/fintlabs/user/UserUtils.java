@@ -72,6 +72,7 @@ public class UserUtils {
         return userhash.isPresent();
     }
 
+    //TODO: Skrive om slik at den logger om bruker er på kafka eller ikke
     public static User getUserFromKafka(String resourceId){
         Optional<User> userFromKafka = publishUserCache.getOptional(resourceId);
         log.info("Get user information from Kafka: {}", userFromKafka);

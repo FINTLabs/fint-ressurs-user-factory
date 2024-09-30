@@ -6,7 +6,6 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.personal.ArbeidsforholdResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.links.ResourceLinkUtil;
-import no.fintlabs.user.UserUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -40,8 +39,14 @@ public class ArbeidsforholdService {
             String resourceId) {
         List<ArbeidsforholdResource> allValidArbeidsresurser = getAllValidArbeidsforholdAsList(arbeidsforholdLinks,
                 currentTime, resourceId);
-        return getValidMainArbeidsforhold(allValidArbeidsresurser, currentTime, resourceId)
+        Optional<ArbeidsforholdResource> hovedarbeidsforhold =  getValidMainArbeidsforhold(allValidArbeidsresurser, currentTime, resourceId)
                 .or(() -> getValidNonMainArbeidsforhold(allValidArbeidsresurser, currentTime,resourceId));
+        hovedarbeidsforhold.ifPresent(arbeidsforholdResource -> log.info("Hovedarbeidsforhold funnet:  {} for user with resourceId {}", arbeidsforholdResource.getSystemId().getIdentifikatorverdi(), resourceId));
+        if (hovedarbeidsforhold.isEmpty()){
+            log.info("No hovedarbeidsforhold found for resourceId {}", resourceId);
+        }
+
+        return hovedarbeidsforhold;
     }
 
 
@@ -50,8 +55,6 @@ public class ArbeidsforholdService {
             Date currenTime,
             String resourceId) {
 
-        boolean userExists = UserUtils.isUserAlreadyOnKafka(resourceId);
-
         return arbeidsforholdLinks
                 .stream()
                 .map(Link::getHref)
@@ -59,62 +62,57 @@ public class ArbeidsforholdService {
                 .map(arbeidsforholdResourceCache::getOptional)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(arbeidsforholdResource -> userExists || isValid(arbeidsforholdResource, currenTime))
+                .filter(arbeidsforholdResource -> isValid(arbeidsforholdResource, currenTime))
                 .toList();
     }
 
 
     private Optional<ArbeidsforholdResource> getValidMainArbeidsforhold(
             List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime, String resourceId) {
-        boolean userExists = UserUtils.isUserAlreadyOnKafka(resourceId);
+
         return arbeidsforholdResources
                 .stream()
                 .filter(ArbeidsforholdResource::getHovedstilling)
-                .filter(arbeidsforholdResource -> userExists || isValid(arbeidsforholdResource, currentTime))
+                .filter(arbeidsforholdResource -> isValid(arbeidsforholdResource, currentTime))
                 .findFirst();
     }
 
     private Optional<ArbeidsforholdResource> getValidNonMainArbeidsforhold(
             List<ArbeidsforholdResource> arbeidsforholdResources, Date currentTime, String resourceId) {
-        boolean userExists = UserUtils.isUserAlreadyOnKafka(resourceId);
+
         return arbeidsforholdResources
                 .stream()
                 .filter(arbeidsforholdResource -> !arbeidsforholdResource.getHovedstilling())
-                .filter(arbeidsforholdResource -> userExists || isValid(arbeidsforholdResource, currentTime))
+                .filter(arbeidsforholdResource -> isValid(arbeidsforholdResource, currentTime))
                 .max(Comparator.comparingLong(ArbeidsforholdResource::getAnsettelsesprosent));
     }
 
 
     private boolean isValid(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
         return gyldighetsperiodeService.isValid(
-                arbeidsforholdResource.getArbeidsforholdsperiode() != null
-                        ? arbeidsforholdResource.getArbeidsforholdsperiode()
-                        : arbeidsforholdResource.getGyldighetsperiode(),
-                currentTime,daysBeforeStartEmployee
+                arbeidsforholdResource.getGyldighetsperiode(), currentTime, daysBeforeStartEmployee
         );
     }
 
 
     public List<Optional<OrganisasjonselementResource>> getAllArbeidssteder(List<ArbeidsforholdResource> arbeidsforholdResourceList,
                                                                             Date currentTime) {
-        List<Optional<OrganisasjonselementResource>> organisasjonsElementResourceList = arbeidsforholdResourceList
+
+        return arbeidsforholdResourceList
                 .stream()
                 .map(arbeidsforholdResource -> getArbeidssted(arbeidsforholdResource, currentTime))
                 .toList();
-
-        return organisasjonsElementResourceList;
     }
 
 
     public Optional<OrganisasjonselementResource> getArbeidssted(ArbeidsforholdResource arbeidsforholdResource, Date currentTime) {
-        Optional<OrganisasjonselementResource> organisasjonselementResoureOptional = ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
+
+
+        return ResourceLinkUtil.getOptionalFirstLink(arbeidsforholdResource::getArbeidssted)
                 .map(ResourceLinkUtil::organisasjonsIdToLowerCase)
                 .flatMap(organisasjonselementResourceCache::getOptional)
                 .filter(organisasjonselementResource ->
                         gyldighetsperiodeService.isValid(organisasjonselementResource.getGyldighetsperiode(), currentTime,daysBeforeStartEmployee));
-
-
-        return organisasjonselementResoureOptional;
     }
 
 

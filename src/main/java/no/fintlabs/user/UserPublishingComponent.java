@@ -81,15 +81,16 @@ public class UserPublishingComponent {
         }
 
         //Hovedstilling eller stilling med høyest stillingsprosent hvis hovedstilling ikke er spesifisert
-        Optional<ArbeidsforholdResource> arbeidsforholdOptional =
+        Optional<ArbeidsforholdResource> hovedArbeidsforholdOptional =
                 arbeidsforholdService.getHovedArbeidsforhold(personalressursResource.getArbeidsforhold(), currentTime, resourceId);
-        if (arbeidsforholdOptional.isEmpty()) {
+
+        if (hovedArbeidsforholdOptional.isEmpty()) {
             log.info("Creating user failed, resourceId={}, missing arbeidsforhold", resourceId);
             return Optional.empty();
         }
-        Optional<OrganisasjonselementResource> hovedArbeidsstedOptional = arbeidsforholdOptional
-                .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
 
+        Optional<OrganisasjonselementResource> hovedArbeidsstedOptional = hovedArbeidsforholdOptional
+                .flatMap(arbeidsforhold -> arbeidsforholdService.getArbeidssted(arbeidsforhold, currentTime));
 
         //Additional orgunits
         List<String> additionalArbeidssteder = new ArrayList<>();
@@ -108,7 +109,6 @@ public class UserPublishingComponent {
                     .map(orgUnit -> orgUnit.get().getOrganisasjonsId().getIdentifikatorverdi())
                     .toList();
         }
-
 
         Optional<String> lederPersonalressursLinkOptional = hovedArbeidsstedOptional
                 .flatMap(arbeidssted -> ResourceLinkUtil.getOptionalFirstLink(arbeidssted::getLeder));
@@ -177,6 +177,7 @@ public class UserPublishingComponent {
                 ? String.valueOf(UserUtils.UserType.EMPLOYEEFACULTY)
                 : String.valueOf(UserUtils.UserType.EMPLOYEESTAFF);
 
+        log.info("Creating user with resourceId: {}",resourceId);
 
         return User
                 .builder()
