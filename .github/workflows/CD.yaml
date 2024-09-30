@@ -22,24 +22,39 @@ jobs:
       tags: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout repository
+<<<<<<< Updated upstream
         uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3.2.0
+=======
+        uses: actions/checkout@v3.3.0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2.1.0
+>>>>>>> Stashed changes
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
+<<<<<<< Updated upstream
         uses: docker/metadata-action@v5
+=======
+        uses: docker/metadata-action@v4.3.0
+>>>>>>> Stashed changes
         id: meta
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: type=sha,enable=true,priority=100,prefix=shaF-,suffix=,format=short
 
       - name: Build and push Docker image
+<<<<<<< Updated upstream
         uses: docker/build-push-action@v5
+=======
+        uses: docker/build-push-action@v4
+>>>>>>> Stashed changes
         with:
           context: .
           push: true
@@ -55,6 +70,7 @@ jobs:
       packages: write
     strategy:
       matrix:
+<<<<<<< Updated upstream
         include:
           - org: fintlabs-no
             cluster: aks-beta-fint-2021-11-23
@@ -71,13 +87,30 @@ jobs:
 
       - name: Get environment
         uses: actions/github-script@v7
+=======
+        org:
+          - fintlabs-no
+        cluster:
+          - aks-alpha-fint-2021-11-18
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.3.0
+
+      - name: Get environment
+        uses: actions/github-script@v6
+>>>>>>> Stashed changes
         id: environment
         with:
           script: return '${{ matrix.cluster }}'.split('-')[1]
           result-encoding: string
 
       - name: Get resource group name
+<<<<<<< Updated upstream
         uses: actions/github-script@v7
+=======
+        uses: actions/github-script@v6
+>>>>>>> Stashed changes
         id: resource-group
         with:
           script: return 'rg-aks-${{ steps.environment.outputs.result }}'
@@ -85,11 +118,16 @@ jobs:
 
       - name: Bake manifests with Kustomize
         id: bake
+<<<<<<< Updated upstream
         uses: azure/k8s-bake@v3
+=======
+        uses: azure/k8s-bake@v2.4
+>>>>>>> Stashed changes
         with:
           renderEngine: 'kustomize'
           kustomizationPath: 'kustomize/overlays/${{ steps.environment.outputs.result }}/${{ matrix.org }}'
 
+<<<<<<< Updated upstream
       - uses: azure/login@v2
         with:
           creds: "${{ secrets[format('AKS_{0}_FINT_GITHUB', steps.environment.outputs.result)] }}"
@@ -108,10 +146,22 @@ jobs:
 
       - name: Deploy
         uses: azure/k8s-deploy@v5
+=======
+      - name: Set the target cluster
+        uses: azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets[format('AKS_{0}_FINT_GITHUB', steps.environment.outputs.result)] }}"
+          cluster-name: '${{ matrix.cluster }}'
+          resource-group: '${{ steps.resource-group.outputs.result }}'
+
+      - name: Deploy
+        uses: azure/k8s-deploy@v4.9
+>>>>>>> Stashed changes
         with:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: ${{ needs.build-and-push.outputs.tags }}
+<<<<<<< Updated upstream
           namespace: ${{ matrix.org }}
 
       - name: Post to a Slack channel
@@ -124,3 +174,6 @@ jobs:
           [View Details]: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+=======
+          namespace: ${{ matrix.org }}
+>>>>>>> Stashed changes

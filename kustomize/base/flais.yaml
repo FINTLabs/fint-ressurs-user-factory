@@ -4,6 +4,7 @@ metadata:
   name: fint-kontroll-user-factory
   namespace: fintlabs-no
 spec:
+<<<<<<< Updated upstream
   orgId: orgid
   image: ghcr.io/fintlabs/fint-kontroll-user-factory:latest
   imagePullPolicy: Always
@@ -22,6 +23,18 @@ spec:
       value: '0'
     - name: fint.kontroll.user.days-before-start-student
       value: '0'
+=======
+  orgId: fintlabs.no
+  image: ghcr.io/fintlabs/fint-kontroll-user-factory:latest
+  imagePullPolicy: Always
+  env:
+    - name: fint.client.base-url
+      value: 'http://fint-kontroll-mock-service:3000'
+    - name: fint.kontroll.datainput
+      value: 'mock'
+    - name: fint.resource-gateway.authorization
+      value: 'disabled'
+>>>>>>> Stashed changes
   kafka:
     enabled: true
     acls:

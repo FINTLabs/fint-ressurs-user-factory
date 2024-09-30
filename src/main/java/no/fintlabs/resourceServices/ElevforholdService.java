@@ -60,16 +60,14 @@ public class ElevforholdService {
     ){
         return elevforholdResources
                 .stream()
-                //.filter(elevforholdResource -> isValid(elevforholdResource,currentTime))
-                .filter(this::isHovedSkole)
+                .filter(elevforholdResource -> isValid(elevforholdResource,currentTime))
+                //.filter(this::isHovedSkole)
                 .findFirst();
     }
 
 
     private boolean isHovedSkole(ElevforholdResource elevforhold){
-        if (elevforhold.getHovedskole()){
-            return true;
-        }else return false;
+        return elevforhold.getHovedskole();
     }
 
     private boolean isValid(ElevforholdResource elevforholdResource, Date currentTime){
