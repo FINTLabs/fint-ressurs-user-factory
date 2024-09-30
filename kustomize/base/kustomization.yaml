@@ -9,4 +9,4 @@ commonLabels:
     fintlabs.no/team: bas
     fintlabs.no/org-id: org.no
 resources:
-  - flais.yaml
+    - flais.yaml

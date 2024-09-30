@@ -76,7 +76,7 @@ public class UserPublishingElevComponent {
         Optional<PersonResource> personResourceOptional = personUtdanningService
                 .getPersonUtdanning(elevResource);
         if (personResourceOptional.isEmpty()){
-            log.info("Creating user failed, resourceId={}, missing personressurs", resourceId);
+            log.info("Creating user (student) failed, resourceId={}, missing personressurs", resourceId);
             return Optional.empty();
         }
 
@@ -91,21 +91,21 @@ public class UserPublishingElevComponent {
         Optional<SkoleResource> skoleOptional = elevforholdOptional
                 .flatMap(elevforhold -> elevforholdService.getSkole(elevforhold,currentTime));
         if (skoleOptional.isEmpty()){
-            log.info("Creating user failed, resourceId={}, missing skole", resourceId);
+            log.info("Creating user (student) failed, resourceId={}, missing skole", resourceId);
             return Optional.empty();
         }
 
         Optional<OrganisasjonselementResource> skoleOrgUnitOptional = skoleOptional
                 .flatMap(skole -> elevforholdService.getSkoleOrgUnit(skole,currentTime));
         if (skoleOrgUnitOptional.isEmpty()){
-            log.info("Creating user failed, resourceId={}, missing organisasjonelement for skole", resourceId);
+            log.info("Creating user (student) failed, resourceId={}, missing organisasjonelement for skole", resourceId);
             return Optional.empty();
         }
 
         //Azure attributes
         Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
         if (azureUserAttributes.isEmpty() && !isUserOnKafka){
-            log.info("Creating user failed, resourceId={}, missing azure user attributes", resourceId);
+            log.info("Creating user (student) failed, resourceId={}, missing azure user attributes", resourceId);
             return Optional.empty();
         }
 
@@ -160,6 +160,7 @@ public class UserPublishingElevComponent {
         String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
                 && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
 
+        log.info("Creating user (student) with resourceId: {}", resourceId);
 
         return User.builder()
                 .resourceId(resourceId)
