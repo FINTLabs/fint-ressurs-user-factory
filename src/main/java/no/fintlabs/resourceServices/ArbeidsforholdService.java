@@ -41,7 +41,10 @@ public class ArbeidsforholdService {
                 currentTime, resourceId);
         Optional<ArbeidsforholdResource> hovedarbeidsforhold =  getValidMainArbeidsforhold(allValidArbeidsresurser, currentTime, resourceId)
                 .or(() -> getValidNonMainArbeidsforhold(allValidArbeidsresurser, currentTime,resourceId));
-        log.info("Hovedarbeidsforhold:  {} for user with resourceId {}", hovedarbeidsforhold.get().getSystemId().getIdentifikatorverdi(), resourceId);
+        hovedarbeidsforhold.ifPresent(arbeidsforholdResource -> log.info("Hovedarbeidsforhold:  {} for user with resourceId {}", arbeidsforholdResource.getSystemId().getIdentifikatorverdi(), resourceId));
+        if (hovedarbeidsforhold.isEmpty()){
+            log.info("No hovedarbeidsforhold found for resourceId {}", resourceId);
+        }
 
         return hovedarbeidsforhold;
     }
