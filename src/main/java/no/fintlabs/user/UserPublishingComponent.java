@@ -166,9 +166,9 @@ public class UserPublishingComponent {
     ) {
 
 
-        String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
-                .map(Kontaktinformasjon::getMobiltelefonnummer)
-                .orElse("");
+//        String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
+//                .map(Kontaktinformasjon::getMobiltelefonnummer)
+//                .orElse("");
 
         String userStatus = azureUserAttributes.getOrDefault("azureStatus", "").equals("ACTIVE")
                 && fintStatus.equals("ACTIVE") ? "ACTIVE" : "DISABLED";
@@ -188,7 +188,7 @@ public class UserPublishingComponent {
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
                 .organisationUnitIds(additionalArbeidsteder)
-                .mobilePhone(mobilePhone)
+                .mobilePhone(null)
                 .managerRef(lederPersonalressursHref)
                 .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId", "0-0-0-0-0")))
                 .email(azureUserAttributes.getOrDefault("email", ""))

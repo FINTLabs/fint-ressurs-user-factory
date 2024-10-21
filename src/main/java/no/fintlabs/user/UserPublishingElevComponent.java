@@ -153,9 +153,9 @@ public class UserPublishingElevComponent {
     ){
 
 
-        String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
-                .map(Kontaktinformasjon::getMobiltelefonnummer)
-                .orElse("");
+//        String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
+//                .map(Kontaktinformasjon::getMobiltelefonnummer)
+//                .orElse("");
 
         String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
                 && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
@@ -169,7 +169,7 @@ public class UserPublishingElevComponent {
                 .userType(String.valueOf(UserUtils.UserType.STUDENT))
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
-                .mobilePhone(mobilePhone)
+                .mobilePhone(null)
                 .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
                 .email(azureUserAttributes.getOrDefault("email",""))
                 .userName(azureUserAttributes.getOrDefault("userName",""))
