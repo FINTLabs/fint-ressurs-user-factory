@@ -170,6 +170,9 @@ public class UserPublishingComponent {
 //                .map(Kontaktinformasjon::getMobiltelefonnummer)
 //                .orElse("");
 
+        Date validFrom = personalressursResource.getAnsettelsesperiode().getStart();
+        Date validTo = personalressursResource.getAnsettelsesperiode().getSlutt();
+
         String userStatus = azureUserAttributes.getOrDefault("azureStatus", "").equals("ACTIVE")
                 && fintStatus.equals("ACTIVE") ? "ACTIVE" : "DISABLED";
 
@@ -195,6 +198,8 @@ public class UserPublishingComponent {
                 .userName(azureUserAttributes.getOrDefault("userName", ""))
                 .status(userStatus)
                 .statusChanged(statusChanged)
+                .validFrom(validFrom)
+                .validTo(validTo)
                 .build();
     }
 

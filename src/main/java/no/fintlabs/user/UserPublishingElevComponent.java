@@ -30,7 +30,7 @@ public class UserPublishingElevComponent {
     public UserPublishingElevComponent(
             ElevService elevService,
             PersonUtdanningService personUtdanningService,
-            ElevforholdService elevforholdService, AzureUserService azureUserService, UserEntityProducerService userEntityProducerService){
+            ElevforholdService elevforholdService, AzureUserService azureUserService, UserEntityProducerService userEntityProducerService) {
         this.elevService = elevService;
         this.personUtdanningService = personUtdanningService;
         this.elevforholdService = elevforholdService;
@@ -42,7 +42,7 @@ public class UserPublishingElevComponent {
             initialDelayString = "${fint.kontroll.user.publishing.initial-delay-elev}",
             fixedDelayString = "${fint.kontroll.user.publishing.fixed-delay}"
     )
-    public void publishElevUsers(){
+    public void publishElevUsers() {
         Date currentTime = Date.from(Instant.now());
         log.info("<< Start scheduled import of students >>");
         List<ElevResource> allElevUsersWithElevforhold = elevService.getAllEleverWithElevforhold(currentTime);
@@ -50,14 +50,14 @@ public class UserPublishingElevComponent {
 
         List<User> allValidElevUsers = allElevUsersWithElevforhold
                 .stream()
-                .map(elevResource -> createUser(elevResource,currentTime))
+                .map(elevResource -> createUser(elevResource, currentTime))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
         List<User> publishedElevUsers = userEntityProducerService.publishChangedUsers(allValidElevUsers);
-        log.info("Number of elevressurser read from FINT: {}",allElevUsersWithElevforhold.size());
-        log.info("Number og users from Entra ID: {}",azureUserService.getNumberOfAzureUsersInCache());
+        log.info("Number of elevressurser read from FINT: {}", allElevUsersWithElevforhold.size());
+        log.info("Number og users from Entra ID: {}", azureUserService.getNumberOfAzureUsersInCache());
         log.info("Published {} of {} students users in cache ", publishedElevUsers.size(), allValidElevUsers.size());
         log.debug("Ids of published users (students) : {}",
                 publishedElevUsers.stream()
@@ -75,36 +75,36 @@ public class UserPublishingElevComponent {
 
         Optional<PersonResource> personResourceOptional = personUtdanningService
                 .getPersonUtdanning(elevResource);
-        if (personResourceOptional.isEmpty()){
+        if (personResourceOptional.isEmpty()) {
             log.info("Creating user (student) failed, resourceId={}, missing personressurs", resourceId);
             return Optional.empty();
         }
 
 
         Optional<ElevforholdResource> elevforholdOptional =
-                elevforholdService.getElevforhold(elevResource.getElevforhold(),currentTime);
+                elevforholdService.getElevforhold(elevResource.getElevforhold(), currentTime);
         if (elevforholdOptional.isEmpty()) {
             log.info("Creating user failed, resourceId={}, missing elevforhold", resourceId);
             return Optional.empty();
         }
 
         Optional<SkoleResource> skoleOptional = elevforholdOptional
-                .flatMap(elevforhold -> elevforholdService.getSkole(elevforhold,currentTime));
-        if (skoleOptional.isEmpty()){
+                .flatMap(elevforhold -> elevforholdService.getSkole(elevforhold, currentTime));
+        if (skoleOptional.isEmpty()) {
             log.info("Creating user (student) failed, resourceId={}, missing skole", resourceId);
             return Optional.empty();
         }
 
         Optional<OrganisasjonselementResource> skoleOrgUnitOptional = skoleOptional
-                .flatMap(skole -> elevforholdService.getSkoleOrgUnit(skole,currentTime));
-        if (skoleOrgUnitOptional.isEmpty()){
+                .flatMap(skole -> elevforholdService.getSkoleOrgUnit(skole, currentTime));
+        if (skoleOrgUnitOptional.isEmpty()) {
             log.info("Creating user (student) failed, resourceId={}, missing organisasjonelement for skole", resourceId);
             return Optional.empty();
         }
 
         //Azure attributes
-        Optional<Map<String,String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
-        if (azureUserAttributes.isEmpty() && !isUserOnKafka){
+        Optional<Map<String, String>> azureUserAttributes = azureUserService.getAzureUserAttributes(resourceId);
+        if (azureUserAttributes.isEmpty() && !isUserOnKafka) {
             log.info("Creating user (student) failed, resourceId={}, missing azure user attributes", resourceId);
             return Optional.empty();
         }
@@ -120,10 +120,12 @@ public class UserPublishingElevComponent {
             azureUserAttributes = Optional.of(attributes);
         }
 
-        String fintStatus = UserUtils.getFINTElevStatus(elevforholdOptional.get(),currentTime);
-        Date statusChanged = fintStatus.equals("ACTIVE")
-                ?elevforholdOptional.get().getGyldighetsperiode().getStart()
-                :elevforholdOptional.get().getGyldighetsperiode().getSlutt();
+        String fintStatus = UserUtils.getFINTElevStatus(elevforholdOptional.get(), currentTime);
+
+        Date validFrom = elevforholdOptional.get().getGyldighetsperiode().getStart();
+        Date validTo = elevforholdOptional.get().getGyldighetsperiode().getSlutt();
+
+        Date statusChanged = fintStatus.equals("ACTIVE") ? validFrom : validTo;
 
 
         return Optional.of(
@@ -135,7 +137,9 @@ public class UserPublishingElevComponent {
                         azureUserAttributes.get(),
                         resourceId,
                         fintStatus,
-                        statusChanged
+                        statusChanged,
+                        validFrom,
+                        validTo
                 )
 
         );
@@ -146,19 +150,22 @@ public class UserPublishingElevComponent {
             PersonResource personResource,
             String organisasjonsnavn,
             String organisasjonsId,
-            Map<String,String> azureUserAttributes,
+            Map<String, String> azureUserAttributes,
             String resourceId,
             String fintStatus,
-            Date statusChanged
-    ){
+            Date statusChanged,
+            Date validFrom,
+            Date validTo
+    ) {
 
 
 //        String mobilePhone = Optional.ofNullable(personResource.getKontaktinformasjon())
 //                .map(Kontaktinformasjon::getMobiltelefonnummer)
 //                .orElse("");
 
-        String userStatus = azureUserAttributes.getOrDefault("azureStatus","").equals("ACTIVE")
-                && fintStatus.equals("ACTIVE")?"ACTIVE":"DISABLED";
+
+        String userStatus = azureUserAttributes.getOrDefault("azureStatus", "").equals("ACTIVE")
+                && fintStatus.equals("ACTIVE") ? "ACTIVE" : "DISABLED";
 
         log.info("Creating user (student) with resourceId: {}", resourceId);
 
@@ -170,11 +177,13 @@ public class UserPublishingElevComponent {
                 .mainOrganisationUnitName(organisasjonsnavn)
                 .mainOrganisationUnitId(organisasjonsId)
                 .mobilePhone(null)
-                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId","0-0-0-0-0")))
-                .email(azureUserAttributes.getOrDefault("email",""))
-                .userName(azureUserAttributes.getOrDefault("userName",""))
+                .identityProviderUserObjectId(UUID.fromString(azureUserAttributes.getOrDefault("identityProviderUserObjectId", "0-0-0-0-0")))
+                .email(azureUserAttributes.getOrDefault("email", ""))
+                .userName(azureUserAttributes.getOrDefault("userName", ""))
                 .status(userStatus)
                 .statusChanged(statusChanged)
+                .validFrom(validFrom)
+                .validTo(validTo)
                 .build();
     }
 }
