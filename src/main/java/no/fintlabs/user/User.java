@@ -29,5 +29,7 @@ public class User {
     private  String managerRef;
     private String status;
     private Date statusChanged;
+    private Date validFrom;
+    private Date validTo;
 
 }
