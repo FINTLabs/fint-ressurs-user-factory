@@ -39,7 +39,7 @@ patches:
         value: "-XX:+ExitOnOutOfMemoryError -Xmx896m -verbose:gc"
       - op: replace
         path: "/spec/env/5/value"
-        value: "0"
+        value: "14"
       - op: replace
         path: "/spec/env/6/value"
         value: "5"
